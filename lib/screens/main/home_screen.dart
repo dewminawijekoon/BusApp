@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:go_router/go_router.dart';
 import '../../config/app_routes.dart';
+import 'alert_screen.dart';
 
 // Import providers
 import '../../providers/auth_provider.dart';
@@ -37,21 +38,17 @@ class _HomeScreenState extends State<HomeScreen>
       vsync: this,
     );
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
 
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOutCubic,
-    ));
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: Curves.easeOutCubic,
+          ),
+        );
 
     _animationController.forward();
   }
@@ -63,12 +60,11 @@ class _HomeScreenState extends State<HomeScreen>
       if (authProvider.isAuthenticated) {
         // User data is already loaded in the auth provider
       }
-      
+
       // Initialize and get current location
       final locationProvider = context.read<LocationProvider>();
       await locationProvider.initialize(); // Initialize first
       await locationProvider.getCurrentLocation();
-      
     } catch (e) {
       // Handle errors silently for now
       debugPrint('Error loading home data: $e');
@@ -122,8 +118,10 @@ class _HomeScreenState extends State<HomeScreen>
                       child: Consumer<AuthProvider>(
                         builder: (context, authProvider, child) {
                           final greeting = _getGreeting();
-                          final userName = authProvider.currentUser?.name.split(' ').first;
-                          
+                          final userName = authProvider.currentUser?.name
+                              .split(' ')
+                              .first;
+
                           return Row(
                             children: [
                               Icon(
@@ -137,7 +135,9 @@ class _HomeScreenState extends State<HomeScreen>
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    userName != null ? '$greeting, $userName!' : greeting,
+                                    userName != null
+                                        ? '$greeting, $userName!'
+                                        : greeting,
                                     style: textTheme.titleMedium?.copyWith(
                                       color: colorScheme.onSurface,
                                       fontWeight: FontWeight.w500,
@@ -146,7 +146,9 @@ class _HomeScreenState extends State<HomeScreen>
                                   Text(
                                     'Plan your journey',
                                     style: textTheme.bodySmall?.copyWith(
-                                      color: colorScheme.onSurface.withOpacity(0.7),
+                                      color: colorScheme.onSurface.withOpacity(
+                                        0.7,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -168,10 +170,7 @@ class _HomeScreenState extends State<HomeScreen>
                   },
                   icon: Stack(
                     children: [
-                      Icon(
-                        Symbols.notifications,
-                        color: colorScheme.onSurface,
-                      ),
+                      Icon(Symbols.notifications, color: colorScheme.onSurface),
                       // Notification badge
                       Positioned(
                         right: 0,
@@ -267,7 +266,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   Widget _buildQuickActions(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -344,10 +343,10 @@ class _HomeScreenState extends State<HomeScreen>
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        locationProvider.currentAddress ?? 
-                        (locationProvider.hasLocation 
-                          ? 'Location found' 
-                          : 'Location not available'),
+                        locationProvider.currentAddress ??
+                            (locationProvider.hasLocation
+                                ? 'Location found'
+                                : 'Location not available'),
                         style: textTheme.bodyMedium?.copyWith(
                           color: colorScheme.onSurface.withOpacity(0.7),
                         ),
@@ -355,8 +354,8 @@ class _HomeScreenState extends State<HomeScreen>
                       const SizedBox(height: 8),
                       Text(
                         locationProvider.nearestBusStop != null
-                          ? 'Nearest stop: ${locationProvider.nearestBusStop!.name} (${locationProvider.distanceToNearestStop?.toStringAsFixed(0)}m)'
-                          : 'Finding nearest stop...',
+                            ? 'Nearest stop: ${locationProvider.nearestBusStop!.name} (${locationProvider.distanceToNearestStop?.toStringAsFixed(0)}m)'
+                            : 'Finding nearest stop...',
                         style: textTheme.bodySmall?.copyWith(
                           color: colorScheme.primary,
                         ),
@@ -365,20 +364,19 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                 ),
                 IconButton(
-                  onPressed: locationProvider.isLoading ? null : () => _refreshLocation(),
+                  onPressed: locationProvider.isLoading
+                      ? null
+                      : () => _refreshLocation(),
                   icon: locationProvider.isLoading
-                    ? SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: colorScheme.primary,
-                        ),
-                      )
-                    : Icon(
-                        Symbols.refresh,
-                        color: colorScheme.primary,
-                      ),
+                      ? SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: colorScheme.primary,
+                          ),
+                        )
+                      : Icon(Symbols.refresh, color: colorScheme.primary),
                 ),
               ],
             ),
@@ -390,7 +388,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   Widget _buildRecentRoutes(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -418,10 +416,26 @@ class _HomeScreenState extends State<HomeScreen>
             itemCount: 3,
             itemBuilder: (context, index) {
               return _RecentRouteCard(
-                from: index == 0 ? 'Home' : index == 1 ? 'Office' : 'Mall',
-                to: index == 0 ? 'Office' : index == 1 ? 'Home' : 'Home',
-                time: index == 0 ? '8:30 AM' : index == 1 ? '5:45 PM' : '2:15 PM',
-                duration: index == 0 ? '35 min' : index == 1 ? '42 min' : '28 min',
+                from: index == 0
+                    ? 'Home'
+                    : index == 1
+                    ? 'Office'
+                    : 'Mall',
+                to: index == 0
+                    ? 'Office'
+                    : index == 1
+                    ? 'Home'
+                    : 'Home',
+                time: index == 0
+                    ? '8:30 AM'
+                    : index == 1
+                    ? '5:45 PM'
+                    : '2:15 PM',
+                duration: index == 0
+                    ? '35 min'
+                    : index == 1
+                    ? '42 min'
+                    : '28 min',
                 onTap: () => _useRoute(index),
               );
             },
@@ -433,7 +447,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   Widget _buildLiveBusUpdates(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -448,9 +462,17 @@ class _HomeScreenState extends State<HomeScreen>
         ...List.generate(3, (index) {
           return _LiveBusCard(
             routeNumber: 'Route ${138 + index}',
-            destination: index == 0 ? 'Fort' : index == 1 ? 'Nugegoda' : 'Maharagama',
+            destination: index == 0
+                ? 'Fort'
+                : index == 1
+                ? 'Nugegoda'
+                : 'Maharagama',
             eta: '${5 + index * 3} min',
-            crowdLevel: index == 0 ? 'Low' : index == 1 ? 'Medium' : 'High',
+            crowdLevel: index == 0
+                ? 'Low'
+                : index == 1
+                ? 'Medium'
+                : 'High',
             onTrack: () => _trackBus(138 + index),
           );
         }),
@@ -465,7 +487,7 @@ class _HomeScreenState extends State<HomeScreen>
     return Consumer<AuthProvider>(
       builder: (context, authProvider, child) {
         final points = authProvider.currentUser?.points ?? 0;
-        
+
         return Card(
           elevation: 2,
           surfaceTintColor: colorScheme.surfaceTint,
@@ -526,7 +548,9 @@ class _HomeScreenState extends State<HomeScreen>
                         Text(
                           'Tap to view rewards',
                           style: textTheme.bodySmall?.copyWith(
-                            color: colorScheme.onPrimaryContainer.withOpacity(0.8),
+                            color: colorScheme.onPrimaryContainer.withOpacity(
+                              0.8,
+                            ),
                           ),
                         ),
                       ],
@@ -547,10 +571,7 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Future<void> _handleRefresh() async {
-    await Future.wait([
-      _refreshLocation(),
-      _loadHomeData(),
-    ]);
+    await Future.wait([_refreshLocation(), _loadHomeData()]);
   }
 
   Future<void> _refreshLocation() async {
@@ -571,16 +592,18 @@ class _HomeScreenState extends State<HomeScreen>
 
   void _showNearbyStops() {
     final locationProvider = context.read<LocationProvider>();
-    
+
     if (!locationProvider.hasLocation) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Location not available. Please enable location services.'),
+          content: Text(
+            'Location not available. Please enable location services.',
+          ),
         ),
       );
       return;
     }
-    
+
     // TODO: Navigate to nearby stops screen or show bottom sheet (using routes for now)
     context.go(AppRoutes.routesPage);
   }
@@ -639,23 +662,21 @@ class _QuickActionCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(
-                icon,
-                size: 32,
-                color: color,
-              ),
+              Icon(icon, size: 32, color: color),
               const SizedBox(height: 12),
               Text(
                 title,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 4),
               Text(
                 subtitle,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.7),
                 ),
               ),
             ],
@@ -702,11 +723,7 @@ class _RecentRouteCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(
-                      Symbols.circle,
-                      size: 8,
-                      color: colorScheme.primary,
-                    ),
+                    Icon(Symbols.circle, size: 8, color: colorScheme.primary),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
@@ -794,8 +811,8 @@ class _LiveBusCard extends StatelessWidget {
     Color crowdColor = crowdLevel == 'Low'
         ? Colors.green
         : crowdLevel == 'Medium'
-            ? Colors.orange
-            : Colors.red;
+        ? Colors.orange
+        : Colors.red;
 
     return Card(
       elevation: 1,

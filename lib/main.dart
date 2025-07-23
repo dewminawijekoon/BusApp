@@ -22,6 +22,7 @@ import 'providers/route_provider.dart';
 import 'services/route_service.dart';
 import 'services/database_service.dart';
 import 'services/firebase_service.dart';
+import 'screens/main/alert_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,39 +42,28 @@ final GoRouter _router = GoRouter(
       routes: [
         GoRoute(
           path: AppRoutes.home,
-          pageBuilder: (context, state) => NoTransitionPage(
-            key: state.pageKey,
-            child: HomeScreen(),
-          ),
+          pageBuilder: (context, state) =>
+              NoTransitionPage(key: state.pageKey, child: HomeScreen()),
         ),
         GoRoute(
           path: AppRoutes.routesPage,
-          pageBuilder: (context, state) => NoTransitionPage(
-            key: state.pageKey,
-            child: RoutesScreen(),
-          ),
+          pageBuilder: (context, state) =>
+              NoTransitionPage(key: state.pageKey, child: RoutesScreen()),
         ),
         GoRoute(
           path: AppRoutes.alerts,
-          pageBuilder: (context, state) => NoTransitionPage(
-            key: state.pageKey,
-            child: Center(child: Text('Alerts Screen\n(Coming Soon)', textAlign: TextAlign.center)),
-          ),
+          pageBuilder: (context, state) =>
+              NoTransitionPage(key: state.pageKey, child: AlertScreen()),
         ),
         GoRoute(
           path: AppRoutes.account,
-          pageBuilder: (context, state) => NoTransitionPage(
-            key: state.pageKey,
-            child: AccountScreen(),
-          ),
+          pageBuilder: (context, state) =>
+              NoTransitionPage(key: state.pageKey, child: AccountScreen()),
         ),
       ],
     ),
     // Auth routes (outside shell)
-    GoRoute(
-      path: AppRoutes.login,
-      builder: (context, state) => LoginScreen(),
-    ),
+    GoRoute(path: AppRoutes.login, builder: (context, state) => LoginScreen()),
     GoRoute(
       path: AppRoutes.register,
       builder: (context, state) => RegistrationScreen(),
@@ -109,18 +99,12 @@ final GoRouter _router = GoRouter(
                 SizedBox(height: 16),
                 Text(
                   'Help & Support',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 8),
                 Text(
                   'This feature is coming soon!',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                 ),
               ],
             ),
@@ -142,26 +126,16 @@ final GoRouter _router = GoRouter(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.settings,
-                  size: 64,
-                  color: AppTheme.primaryColor,
-                ),
+                Icon(Icons.settings, size: 64, color: AppTheme.primaryColor),
                 SizedBox(height: 16),
                 Text(
                   'App Settings',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 8),
                 Text(
                   'This feature is coming soon!',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                 ),
               ],
             ),
@@ -185,27 +159,27 @@ final GoRouter _router = GoRouter(
       path: AppRoutes.routeDetails,
       builder: (context, state) {
         final extra = state.extra as Map<String, dynamic>?;
-        return RouteDetailsScreen(
-          route: extra?['route'],
-        );
+        return RouteDetailsScreen(route: extra?['route']);
       },
     ),
   ],
   redirect: (context, state) {
     final user = FirebaseAuth.instance.currentUser;
     final isLoggedIn = user != null;
-    final isAuthRoute = state.matchedLocation == AppRoutes.login || state.matchedLocation == AppRoutes.register;
-    
+    final isAuthRoute =
+        state.matchedLocation == AppRoutes.login ||
+        state.matchedLocation == AppRoutes.register;
+
     // If not logged in and not on auth route, redirect to login
     if (!isLoggedIn && !isAuthRoute) {
       return AppRoutes.login;
     }
-    
+
     // If logged in and on auth route, redirect to home
     if (isLoggedIn && isAuthRoute) {
       return AppRoutes.home;
     }
-    
+
     return null; // No redirect needed
   },
 );
