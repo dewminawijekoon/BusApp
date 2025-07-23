@@ -1,0 +1,223 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# iOS/macOS related
+**/ios/**/*.mode1v3
+**/ios/**/*.mode2v3
+**/ios/**/*.moved-aside
+**/ios/**/*.pbxuser
+**/ios/**/*.perspectivev3
+**/ios/**/UserInterfaceState.xcuserstate
+**/ios/.generated/
+**/ios/Flutter/App.framework
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/ephemeral
+**/ios/Flutter/app.flx
+**/ios/Flutter/app.zip
+**/ios/Flutter/flutter_assets/
+**/ios/ServiceDefinitions.json
+**/ios/Runner/GeneratedPluginRegistrant.*
+**/macos/Flutter/GeneratedPluginRegistrant.swift
+**/ios/**/*.xcscmblueprint
+**/ios/**/*.xccheckout
+**/ios/DerivedData/
+**/ios/build/
+
+# Web related
+lib/generated_plugin_registrant.dart
+
+# Android related
+**/android/**/gradle-wrapper.jar
+**/android/.gradle
+**/android/captures/
+**/android/gradlew
+**/android/gradlew.bat
+**/android/local.properties
+**/android/**/GeneratedPluginRegistrant.java
+**/android/key.properties
+*.jks
+**/android/app/src/debug/AndroidManifest.xml
+
+# Firebase related - IMPORTANT FOR YOUR PROJECT
+# Keep firebase configuration files but ignore sensitive ones
+**/android/app/google-services.json
+**/ios/Runner/GoogleService-Info.plist
+**/ios/firebase_app_id_file.json
+**/macos/Runner/GoogleService-Info.plist
+**/macos/firebase_app_id_file.json
+**/web/firebase-config.js
+lib/firebase_options.dart
+.firebaserc
+firebase-debug.log
+firebase-debug.*.log
+**/functions/node_modules/
+**/functions/.runtimeconfig.json
+
+# API Keys and Secrets - CRITICAL FOR YOUR PROJECT
+**/lib/config/api_keys.dart
+**/lib/config/secrets.dart
+**/lib/config/environment.dart
+.env
+.env.local
+.env.*.local
+
+# Google Maps API - IMPORTANT FOR YOUR PROJECT
+**/android/app/src/main/res/values/google_maps_api.xml
+**/ios/Runner/GoogleMaps-Info.plist
+
+# Generated files
+*.g.dart
+*.freezed.dart
+*.gr.dart
+*.config.dart
+
+# Localization
+**/lib/l10n/app_localizations*.dart
+**/lib/l10n/app_localizations_*.arb
+
+# Coverage
+coverage/
+lcov.info
+*.lcov
+test/.test_coverage.dart
+coverage_helper_test.dart
+
+# Fastlane
+**/fastlane/report.xml
+**/fastlane/Preview.html
+**/fastlane/screenshots
+**/fastlane/test_output
+
+# App signing - CRITICAL SECURITY
+**/android/app/upload-keystore.jks
+**/android/app/key.properties
+**/android/signing/
+**/ios/Runner.xcworkspace/xcshareddata/
+**/ios/Runner.xcworkspace/xcuserdata/
+**/ios/AuthKey_*.p8
+
+# Windows
+**/windows/flutter/generated_plugin_registrant.cc
+**/windows/flutter/generated_plugin_registrant.h
+**/windows/flutter/generated_plugins.cmake
+
+# Linux
+**/linux/flutter/generated_plugin_registrant.cc
+**/linux/flutter/generated_plugin_registrant.h
+
+# macOS
+**/macos/Runner.xcworkspace/xcshareddata/
+**/macos/Runner.xcworkspace/xcuserdata/
+
+# FVM (Flutter Version Management)
+.fvm/
+
+# IDE workspace files
+*.code-workspace
+.vscode/settings.json
+.vscode/launch.json
+
+# Temporary files
+*.tmp
+*.temp
+.tmp/
+.temp/
+
+# Log files
+*.log
+logs/
+
+# Database files (if using local databases)
+*.db
+*.sqlite
+*.sqlite3
+
+# Backup files
+*.backup
+*.bak
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE_BIN/
+
+# Node.js (if using for cloud functions)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build artifacts
+*.apk
+*.aab
+*.ipa
+*.app
+
+# PROJECT SPECIFIC - Transportation App
+# Maps and location cache
+maps_cache/
+location_cache/
+route_cache/
+
+# User uploaded content
+uploads/
+user_content/
+profile_images/
+
+# Local development files
+dev_notes.txt
+todo.md
+.env.development
+
+# Documentation build
+docs/_build/
+
+# Keep these files (uncomment if you want to track them)
+# !pubspec.lock
