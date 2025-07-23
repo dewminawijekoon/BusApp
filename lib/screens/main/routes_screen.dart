@@ -24,7 +24,7 @@ class _RoutesScreenState extends State<RoutesScreen>
   late TabController _tabController;
   final PageController _pageController = PageController();
   bool _isSearchExpanded = false;
-  
+
   // Search controllers
   final TextEditingController _fromController = TextEditingController();
   final TextEditingController _toController = TextEditingController();
@@ -37,7 +37,7 @@ class _RoutesScreenState extends State<RoutesScreen>
     _tabController = TabController(length: 3, vsync: this);
     _selectedDate = DateTime.now();
     _selectedTime = material.TimeOfDay.now();
-    
+
     // Load initial data
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // TODO: Implement loadPopularRoutes and loadSavedRoutes in RouteProvider
@@ -77,7 +77,7 @@ class _RoutesScreenState extends State<RoutesScreen>
 
     // Perform search
     final routeProvider = context.read<RouteProvider>();
-    
+
     // Create BusStop objects from the text input
     final now = DateTime.now();
     final startStop = BusStop(
@@ -88,7 +88,7 @@ class _RoutesScreenState extends State<RoutesScreen>
       createdAt: now,
       updatedAt: now,
     );
-    
+
     final endStop = BusStop(
       id: 'end_${_toController.text.hashCode}',
       name: _toController.text,
@@ -97,7 +97,7 @@ class _RoutesScreenState extends State<RoutesScreen>
       createdAt: now,
       updatedAt: now,
     );
-    
+
     await routeProvider.searchRoutes(
       startStop: startStop,
       endStop: endStop,
@@ -134,7 +134,7 @@ class _RoutesScreenState extends State<RoutesScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       body: Column(
@@ -178,7 +178,8 @@ class _RoutesScreenState extends State<RoutesScreen>
                                   hintText: 'From where?',
                                   border: InputBorder.none,
                                   hintStyle: TextStyle(
-                                    color: theme.colorScheme.onSurface.withOpacity(0.6),
+                                    color: theme.colorScheme.onSurface
+                                        .withOpacity(0.6),
                                   ),
                                 ),
                               ),
@@ -190,14 +191,16 @@ class _RoutesScreenState extends State<RoutesScreen>
                             ),
                           ],
                         ),
-                        
+
                         // Divider with swap button
                         Row(
                           children: [
                             const SizedBox(width: 32),
                             Expanded(
                               child: Divider(
-                                color: theme.colorScheme.onSurface.withOpacity(0.2),
+                                color: theme.colorScheme.onSurface.withOpacity(
+                                  0.2,
+                                ),
                               ),
                             ),
                             IconButton(
@@ -207,12 +210,14 @@ class _RoutesScreenState extends State<RoutesScreen>
                             ),
                             Expanded(
                               child: Divider(
-                                color: theme.colorScheme.onSurface.withOpacity(0.2),
+                                color: theme.colorScheme.onSurface.withOpacity(
+                                  0.2,
+                                ),
                               ),
                             ),
                           ],
                         ),
-                        
+
                         // To field
                         Row(
                           children: [
@@ -229,87 +234,108 @@ class _RoutesScreenState extends State<RoutesScreen>
                                   hintText: 'Where to?',
                                   border: InputBorder.none,
                                   hintStyle: TextStyle(
-                                    color: theme.colorScheme.onSurface.withOpacity(0.6),
+                                    color: theme.colorScheme.onSurface
+                                        .withOpacity(0.6),
                                   ),
                                 ),
                               ),
                             ),
                           ],
                         ),
-                        
+
                         const SizedBox(height: 16),
-                        
+
                         // Date and time selection
                         AnimatedSize(
                           duration: const Duration(milliseconds: 200),
-                          child: _isSearchExpanded ? Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: InkWell(
-                                      onTap: () => _selectDate(context),
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 12,
-                                          horizontal: 16,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                            color: theme.colorScheme.outline.withOpacity(0.3),
-                                          ),
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            const Icon(Symbols.calendar_today, size: 16),
-                                            const SizedBox(width: 8),
-                                            Text(
-                                              _selectedDate != null
-                                                  ? '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}'
-                                                  : 'Select Date',
+                          child: _isSearchExpanded
+                              ? Column(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: InkWell(
+                                            onTap: () => _selectDate(context),
+                                            child: Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    vertical: 12,
+                                                    horizontal: 16,
+                                                  ),
+                                              decoration: BoxDecoration(
+                                                border: Border.all(
+                                                  color: theme
+                                                      .colorScheme
+                                                      .outline
+                                                      .withOpacity(0.3),
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                              child: Row(
+                                                children: [
+                                                  const Icon(
+                                                    Symbols.calendar_today,
+                                                    size: 16,
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  Text(
+                                                    _selectedDate != null
+                                                        ? '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}'
+                                                        : 'Select Date',
+                                                  ),
+                                                ],
+                                              ),
                                             ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: InkWell(
-                                      onTap: () => _selectTime(context),
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 12,
-                                          horizontal: 16,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                            color: theme.colorScheme.outline.withOpacity(0.3),
                                           ),
-                                          borderRadius: BorderRadius.circular(8),
                                         ),
-                                        child: Row(
-                                          children: [
-                                            const Icon(Symbols.schedule, size: 16),
-                                            const SizedBox(width: 8),
-                                            Text(
-                                              _selectedTime != null
-                                                  ? _selectedTime!.format(context)
-                                                  : 'Select Time',
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: InkWell(
+                                            onTap: () => _selectTime(context),
+                                            child: Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    vertical: 12,
+                                                    horizontal: 16,
+                                                  ),
+                                              decoration: BoxDecoration(
+                                                border: Border.all(
+                                                  color: theme
+                                                      .colorScheme
+                                                      .outline
+                                                      .withOpacity(0.3),
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                              child: Row(
+                                                children: [
+                                                  const Icon(
+                                                    Symbols.schedule,
+                                                    size: 16,
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  Text(
+                                                    _selectedTime != null
+                                                        ? _selectedTime!.format(
+                                                            context,
+                                                          )
+                                                        : 'Select Time',
+                                                  ),
+                                                ],
+                                              ),
                                             ),
-                                          ],
+                                          ),
                                         ),
-                                      ),
+                                      ],
                                     ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 16),
-                            ],
-                          ) : const SizedBox.shrink(),
+                                    const SizedBox(height: 16),
+                                  ],
+                                )
+                              : const SizedBox.shrink(),
                         ),
-                        
+
                         // Search button
                         SizedBox(
                           width: double.infinity,
@@ -319,7 +345,7 @@ class _RoutesScreenState extends State<RoutesScreen>
                             label: const Text('Search Routes'),
                           ),
                         ),
-                        
+
                         // Expand/Collapse button
                         TextButton.icon(
                           onPressed: () {
@@ -328,18 +354,20 @@ class _RoutesScreenState extends State<RoutesScreen>
                             });
                           },
                           icon: Icon(
-                            _isSearchExpanded 
-                                ? Symbols.expand_less 
+                            _isSearchExpanded
+                                ? Symbols.expand_less
                                 : Symbols.expand_more,
                             size: 16,
                           ),
-                          label: Text(_isSearchExpanded ? 'Less options' : 'More options'),
+                          label: Text(
+                            _isSearchExpanded ? 'Less options' : 'More options',
+                          ),
                         ),
                       ],
                     ),
                   ),
                 ),
-                
+
                 // Tab bar
                 const SizedBox(height: 8),
                 TabBar(
@@ -353,7 +381,7 @@ class _RoutesScreenState extends State<RoutesScreen>
               ],
             ),
           ),
-          
+
           // Tab content
           Expanded(
             child: TabBarView(
@@ -388,10 +416,7 @@ class _RoutesScreenState extends State<RoutesScreen>
                   color: Theme.of(context).colorScheme.error,
                 ),
                 const SizedBox(height: 16),
-                Text(
-                  'Error',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
+                Text('Error', style: Theme.of(context).textTheme.headlineSmall),
                 const SizedBox(height: 8),
                 Text(
                   provider.error!,
@@ -418,7 +443,9 @@ class _RoutesScreenState extends State<RoutesScreen>
                 Icon(
                   Symbols.search_off,
                   size: 64,
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.3),
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -429,7 +456,9 @@ class _RoutesScreenState extends State<RoutesScreen>
                 Text(
                   'Try searching for different locations or times',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.6),
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -469,7 +498,8 @@ class _RoutesScreenState extends State<RoutesScreen>
           return _buildEmptyState(
             icon: Symbols.trending_up,
             title: 'No Popular Routes',
-            subtitle: 'Popular routes will appear here based on community usage',
+            subtitle:
+                'Popular routes will appear here based on community usage',
           );
         }
 

@@ -48,9 +48,9 @@ class LatLng {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is LatLng && 
-           other.latitude == latitude && 
-           other.longitude == longitude;
+    return other is LatLng &&
+        other.latitude == latitude &&
+        other.longitude == longitude;
   }
 
   @override
@@ -58,20 +58,24 @@ class LatLng {
 }
 
 class MapsService {
-  static const String _apiKey = 'YOUR_GOOGLE_MAPS_API_KEY'; // Replace with actual API key
-  static const String _directionsBaseUrl = 'https://maps.googleapis.com/maps/api/directions/json';
-  static const String _geocodingBaseUrl = 'https://maps.googleapis.com/maps/api/geocode/json';
-  
+  static const String _apiKey =
+      'AIzaSyAiR1opo-AoCsZ0vhXkZZ3lQU65uJWgne'; // Replace with actual API key
+  static const String _directionsBaseUrl =
+      'https://maps.googleapis.com/maps/api/directions/json';
+  static const String _geocodingBaseUrl =
+      'https://maps.googleapis.com/maps/api/geocode/json';
+
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   /// Get directions between two points using Google Directions API
   Future<DirectionsResult?> getDirections(
-    GeoPoint start, 
+    GeoPoint start,
     GeoPoint end, {
     String travelMode = 'driving',
   }) async {
     try {
-      final String url = '$_directionsBaseUrl?'
+      final String url =
+          '$_directionsBaseUrl?'
           'origin=${start.latitude},${start.longitude}&'
           'destination=${end.latitude},${end.longitude}&'
           'mode=$travelMode&'
@@ -81,7 +85,7 @@ class MapsService {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        
+
         if (data['status'] == 'OK' && data['routes'].isNotEmpty) {
           return _parseDirectionsResponse(data);
         }
@@ -97,26 +101,30 @@ class MapsService {
   DirectionsResult _parseDirectionsResponse(Map<String, dynamic> data) {
     final route = data['routes'][0];
     final leg = route['legs'][0];
-    
+
     // Extract polyline points
-    final polylinePoints = _decodePolyline(route['overview_polyline']['points']);
-    
+    final polylinePoints = _decodePolyline(
+      route['overview_polyline']['points'],
+    );
+
     // Extract steps
     final steps = <DirectionStep>[];
     for (var step in leg['steps']) {
-      steps.add(DirectionStep(
-        instruction: step['html_instructions'],
-        distance: step['distance']['text'],
-        duration: step['duration']['text'],
-        startLocation: LatLng(
-          step['start_location']['lat'].toDouble(),
-          step['start_location']['lng'].toDouble(),
+      steps.add(
+        DirectionStep(
+          instruction: step['html_instructions'],
+          distance: step['distance']['text'],
+          duration: step['duration']['text'],
+          startLocation: LatLng(
+            step['start_location']['lat'].toDouble(),
+            step['start_location']['lng'].toDouble(),
+          ),
+          endLocation: LatLng(
+            step['end_location']['lat'].toDouble(),
+            step['end_location']['lng'].toDouble(),
+          ),
         ),
-        endLocation: LatLng(
-          step['end_location']['lat'].toDouble(),
-          step['end_location']['lng'].toDouble(),
-        ),
-      ));
+      );
     }
 
     return DirectionsResult(
@@ -218,12 +226,15 @@ class MapsService {
     double dLat = _toRadians(lat2 - lat1);
     double dLon = _toRadians(lon2 - lon1);
 
-    double a = sin(dLat / 2) * sin(dLat / 2) +
-        cos(_toRadians(lat1)) * cos(_toRadians(lat2)) * 
-        sin(dLon / 2) * sin(dLon / 2);
-    
+    double a =
+        sin(dLat / 2) * sin(dLat / 2) +
+        cos(_toRadians(lat1)) *
+            cos(_toRadians(lat2)) *
+            sin(dLon / 2) *
+            sin(dLon / 2);
+
     double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-    
+
     return earthRadius * c;
   }
 
@@ -252,7 +263,7 @@ class MapsService {
     try {
       // First try using geocoding package
       List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
-      
+
       if (placemarks.isNotEmpty) {
         final place = placemarks.first;
         return _formatPlacemark(place);
@@ -269,7 +280,7 @@ class MapsService {
   /// Format placemark into readable address
   String _formatPlacemark(Placemark place) {
     List<String> parts = [];
-    
+
     if (place.name != null && place.name!.isNotEmpty) {
       parts.add(place.name!);
     }
@@ -279,7 +290,8 @@ class MapsService {
     if (place.locality != null && place.locality!.isNotEmpty) {
       parts.add(place.locality!);
     }
-    if (place.administrativeArea != null && place.administrativeArea!.isNotEmpty) {
+    if (place.administrativeArea != null &&
+        place.administrativeArea!.isNotEmpty) {
       parts.add(place.administrativeArea!);
     }
 
@@ -289,7 +301,8 @@ class MapsService {
   /// Get place using Google Geocoding API as fallback
   Future<String?> _getPlaceFromGoogleGeocoding(double lat, double lng) async {
     try {
-      final String url = '$_geocodingBaseUrl?'
+      final String url =
+          '$_geocodingBaseUrl?'
           'latlng=$lat,$lng&'
           'key=$_apiKey';
 
@@ -297,7 +310,7 @@ class MapsService {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        
+
         if (data['status'] == 'OK' && data['results'].isNotEmpty) {
           return data['results'][0]['formatted_address'];
         }
@@ -313,7 +326,7 @@ class MapsService {
   Future<GeoPoint?> getCoordinatesFromPlace(String placeName) async {
     try {
       List<Location> locations = await locationFromAddress(placeName);
-      
+
       if (locations.isNotEmpty) {
         final location = locations.first;
         return GeoPoint(location.latitude, location.longitude);
@@ -327,25 +340,27 @@ class MapsService {
 
   /// Search for places using Google Places API
   Future<List<PlaceSearchResult>> searchPlaces(
-    String query, 
+    String query,
     GeoPoint? location, {
     double radiusInMeters = 5000,
   }) async {
     try {
-      String url = 'https://maps.googleapis.com/maps/api/place/textsearch/json?'
+      String url =
+          'https://maps.googleapis.com/maps/api/place/textsearch/json?'
           'query=${Uri.encodeComponent(query)}&'
           'key=$_apiKey';
 
       if (location != null) {
-        url += '&location=${location.latitude},${location.longitude}&'
-               'radius=$radiusInMeters';
+        url +=
+            '&location=${location.latitude},${location.longitude}&'
+            'radius=$radiusInMeters';
       }
 
       final response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        
+
         if (data['status'] == 'OK') {
           return (data['results'] as List)
               .map((result) => PlaceSearchResult.fromJson(result))
@@ -372,11 +387,11 @@ class MapsService {
   /// Request location permission
   Future<LocationPermission> requestLocationPermission() async {
     LocationPermission permission = await Geolocator.checkPermission();
-    
+
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
     }
-    
+
     return permission;
   }
 

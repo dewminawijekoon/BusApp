@@ -54,11 +54,11 @@ class _SavedRoutesScreenState extends State<SavedRoutesScreen> {
   Future<void> _useRoute(BusRoute route) async {
     try {
       final routeProvider = Provider.of<RouteProvider>(context, listen: false);
-      await routeProvider.selectRoute(route);
+      routeProvider.selectRoute(route);
       if (mounted) {
         // Using GoRouter navigation instead of Navigator.pushNamed
         // Navigator.pushNamed(context, '/route-tracking', arguments: route);
-        
+
         // For now, just show a message that navigation is not implemented
         _showSuccessSnackBar('Route selected! Navigation feature coming soon.');
       }
@@ -107,9 +107,8 @@ class _SavedRoutesScreenState extends State<SavedRoutesScreen> {
                       children: [
                         Text(
                           route.routeName,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w600),
                         ),
                         const SizedBox(height: 4),
                         Row(
@@ -123,9 +122,8 @@ class _SavedRoutesScreenState extends State<SavedRoutesScreen> {
                             Expanded(
                               child: Text(
                                 '${route.stops.first.stopName} → ${route.stops.last.stopName}',
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Colors.grey[600],
-                                ),
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(color: Colors.grey[600]),
                               ),
                             ),
                           ],
@@ -214,9 +212,9 @@ class _SavedRoutesScreenState extends State<SavedRoutesScreen> {
           const SizedBox(width: 4),
           Text(
             label,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              fontWeight: FontWeight.w500,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w500),
           ),
         ],
       ),
@@ -239,9 +237,7 @@ class _SavedRoutesScreenState extends State<SavedRoutesScreen> {
               Navigator.of(context).pop();
               _deleteRoute(route.id);
             },
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.red,
-            ),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: const Text('Delete'),
           ),
         ],
@@ -270,9 +266,9 @@ class _SavedRoutesScreenState extends State<SavedRoutesScreen> {
           const SizedBox(height: 8),
           Text(
             'Save your frequently used routes for quick access',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Colors.grey[500],
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: Colors.grey[500]),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),
@@ -280,7 +276,7 @@ class _SavedRoutesScreenState extends State<SavedRoutesScreen> {
             onPressed: () {
               // Using GoRouter navigation instead of Navigator.pushNamed
               // Navigator.pushNamed(context, '/routes');
-              
+
               // For now, just show a message
               _showSuccessSnackBar('Route search feature coming soon!');
             },
@@ -315,21 +311,19 @@ class _SavedRoutesScreenState extends State<SavedRoutesScreen> {
         ],
       ),
       body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
+          ? const Center(child: CircularProgressIndicator())
           : _savedRoutes.isEmpty
-              ? _buildEmptyState()
-              : RefreshIndicator(
-                  onRefresh: _loadSavedRoutes,
-                  child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    itemCount: _savedRoutes.length,
-                    itemBuilder: (context, index) {
-                      return _buildSavedRouteCard(_savedRoutes[index]);
-                    },
-                  ),
-                ),
+          ? _buildEmptyState()
+          : RefreshIndicator(
+              onRefresh: _loadSavedRoutes,
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                itemCount: _savedRoutes.length,
+                itemBuilder: (context, index) {
+                  return _buildSavedRouteCard(_savedRoutes[index]);
+                },
+              ),
+            ),
     );
   }
 }
