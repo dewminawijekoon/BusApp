@@ -3,6 +3,15 @@
 ## Project Overview
 A comprehensive Flutter application for public transportation with real-time tracking, route planning, and crowd-sourced bus location sharing. Built with Material UI 3, Firebase integration, and Google Maps.
 
+## ⚡ Quick Start
+```bash
+# 1. Install dependencies
+flutter pub get
+
+# 2. Run the application
+flutter run
+```
+
 ## Tech Stack
 - **Framework**: Flutter (Latest stable)
 - **UI Design**: Material UI 3 with pastel color palette
@@ -62,7 +71,7 @@ dev_dependencies:
 ```
 
 ## Project Structure
-
+###Don't consider implemented files. More than 3/4 is created. Check files.
 ```
 lib/
 ├── config/
