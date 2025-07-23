@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:go_router/go_router.dart';
+import '../../config/app_routes.dart';
 
 // Import providers
 import '../../providers/auth_provider.dart';
@@ -163,7 +164,7 @@ class _HomeScreenState extends State<HomeScreen>
                 IconButton(
                   onPressed: () {
                     // TODO: Open notifications
-                    context.go('/alerts');
+                    context.go(AppRoutes.alerts);
                   },
                   icon: Stack(
                     children: [
@@ -286,7 +287,7 @@ class _HomeScreenState extends State<HomeScreen>
                 title: 'Find Route',
                 subtitle: 'Plan your journey',
                 color: colorScheme.primaryContainer,
-                onTap: () => context.go('/routes'),
+                onTap: () => context.go(AppRoutes.routesPage),
               ),
             ),
             const SizedBox(width: 16),
@@ -404,7 +405,7 @@ class _HomeScreenState extends State<HomeScreen>
               ),
             ),
             TextButton(
-              onPressed: () => context.go('/saved-routes'),
+              onPressed: () => context.go(AppRoutes.savedRoutes),
               child: const Text('View All'),
             ),
           ],
@@ -470,8 +471,8 @@ class _HomeScreenState extends State<HomeScreen>
           surfaceTintColor: colorScheme.surfaceTint,
           child: InkWell(
             onTap: () {
-              // TODO: Navigate to rewards screen
-              context.go('/rewards');
+              // TODO: Navigate to rewards screen (using points for now)
+              context.go(AppRoutes.points);
             },
             borderRadius: BorderRadius.circular(12),
             child: Container(
@@ -580,18 +581,18 @@ class _HomeScreenState extends State<HomeScreen>
       return;
     }
     
-    // TODO: Navigate to nearby stops screen or show bottom sheet
-    context.go('/nearby-stops');
+    // TODO: Navigate to nearby stops screen or show bottom sheet (using routes for now)
+    context.go(AppRoutes.routesPage);
   }
 
   void _useRoute(int index) {
     // TODO: Implement route usage
-    context.go('/routes');
+    context.go(AppRoutes.routesPage);
   }
 
   void _trackBus(int routeNumber) {
-    // TODO: Implement bus tracking
-    context.go('/route-tracking/route_$routeNumber');
+    // TODO: Implement bus tracking - for now navigate to routes
+    context.go(AppRoutes.routesPage);
   }
 
   String _getGreeting() {

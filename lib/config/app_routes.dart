@@ -68,6 +68,30 @@ class AppRoutes {
     });
   }
   
+  static void goToRouteTracking(BuildContext context, {
+    dynamic route,
+  }) {
+    context.go(routeTracking, extra: {
+      'route': route,
+    });
+  }
+  
+  static void goToSavedRoutes(BuildContext context) {
+    context.go(savedRoutes);
+  }
+  
+  static void goToPoints(BuildContext context) {
+    context.go(points);
+  }
+  
+  static void goToHelpSupport(BuildContext context) {
+    context.go(helpSupport);
+  }
+  
+  static void goToSettings(BuildContext context) {
+    context.go(settings);
+  }
+  
   // Helper method to check if route exists
   static bool hasRoute(String routeName) {
     const allRoutes = [

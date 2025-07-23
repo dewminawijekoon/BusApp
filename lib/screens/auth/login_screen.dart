@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/auth_provider.dart';
 import '../../config/constants.dart';
+import '../../config/app_routes.dart';
 import '../../utils/validators.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -297,12 +298,12 @@ class _LoginScreenState extends State<LoginScreen> {
     );
 
     if (success && mounted) {
-      context.go('/');
+      context.go(AppRoutes.home);
     }
   }
 
   void _navigateToRegister() {
-    context.go('/register');
+    context.go(AppRoutes.register);
   }
 
   void _showForgotPasswordDialog() {

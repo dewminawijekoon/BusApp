@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import '../../config/app_routes.dart';
 
 class MainNavigation extends StatefulWidget {
   final Widget child;
@@ -21,22 +22,22 @@ class _MainNavigationState extends State<MainNavigation> {
     NavigationItem(
       icon: Symbols.home,
       label: 'Home',
-      route: '/',
+      route: AppRoutes.home,
     ),
     NavigationItem(
       icon: Symbols.route,
       label: 'Routes',
-      route: '/routes',
+      route: AppRoutes.routesPage,
     ),
     NavigationItem(
       icon: Symbols.notifications,
       label: 'Alerts',
-      route: '/alerts',
+      route: AppRoutes.alerts,
     ),
     NavigationItem(
       icon: Symbols.account_circle,
       label: 'Account',
-      route: '/account',
+      route: AppRoutes.account,
     ),
   ];
 

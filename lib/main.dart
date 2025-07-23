@@ -14,6 +14,7 @@ import 'screens/profile/points_screen.dart';
 import 'screens/routes/route_results_screen.dart';
 import 'screens/routes/route_details_screen.dart';
 import 'config/app_theme.dart';
+import 'config/app_routes.dart';
 import 'providers/auth_provider.dart' as auth;
 import 'providers/user_provider.dart';
 import 'providers/location_provider.dart';
@@ -30,7 +31,7 @@ void main() async {
 
 // GoRouter configuration
 final GoRouter _router = GoRouter(
-  initialLocation: '/',
+  initialLocation: AppRoutes.home,
   routes: [
     // Shell route for main navigation
     ShellRoute(
@@ -39,28 +40,28 @@ final GoRouter _router = GoRouter(
       },
       routes: [
         GoRoute(
-          path: '/',
+          path: AppRoutes.home,
           pageBuilder: (context, state) => NoTransitionPage(
             key: state.pageKey,
             child: HomeScreen(),
           ),
         ),
         GoRoute(
-          path: '/routes',
+          path: AppRoutes.routesPage,
           pageBuilder: (context, state) => NoTransitionPage(
             key: state.pageKey,
             child: RoutesScreen(),
           ),
         ),
         GoRoute(
-          path: '/alerts',
+          path: AppRoutes.alerts,
           pageBuilder: (context, state) => NoTransitionPage(
             key: state.pageKey,
             child: Center(child: Text('Alerts Screen\n(Coming Soon)', textAlign: TextAlign.center)),
           ),
         ),
         GoRoute(
-          path: '/account',
+          path: AppRoutes.account,
           pageBuilder: (context, state) => NoTransitionPage(
             key: state.pageKey,
             child: AccountScreen(),
@@ -70,24 +71,24 @@ final GoRouter _router = GoRouter(
     ),
     // Auth routes (outside shell)
     GoRoute(
-      path: '/login',
+      path: AppRoutes.login,
       builder: (context, state) => LoginScreen(),
     ),
     GoRoute(
-      path: '/register',
+      path: AppRoutes.register,
       builder: (context, state) => RegistrationScreen(),
     ),
     // Profile routes (outside shell for full screen experience)
     GoRoute(
-      path: '/saved-routes',
+      path: AppRoutes.savedRoutes,
       builder: (context, state) => SavedRoutesScreen(),
     ),
     GoRoute(
-      path: '/points',
+      path: AppRoutes.points,
       builder: (context, state) => PointsScreen(),
     ),
     GoRoute(
-      path: '/help-support',
+      path: AppRoutes.helpSupport,
       builder: (context, state) => Scaffold(
         appBar: AppBar(
           title: Text('Help & Support'),
@@ -128,7 +129,7 @@ final GoRouter _router = GoRouter(
       ),
     ),
     GoRoute(
-      path: '/settings',
+      path: AppRoutes.settings,
       builder: (context, state) => Scaffold(
         appBar: AppBar(
           title: Text('Settings'),
@@ -170,7 +171,7 @@ final GoRouter _router = GoRouter(
     ),
     // Route management routes
     GoRoute(
-      path: '/route-results',
+      path: AppRoutes.routeResults,
       builder: (context, state) {
         final extra = state.extra as Map<String, dynamic>?;
         return RouteResultsScreen(
@@ -181,7 +182,7 @@ final GoRouter _router = GoRouter(
       },
     ),
     GoRoute(
-      path: '/route-details',
+      path: AppRoutes.routeDetails,
       builder: (context, state) {
         final extra = state.extra as Map<String, dynamic>?;
         return RouteDetailsScreen(
@@ -193,16 +194,16 @@ final GoRouter _router = GoRouter(
   redirect: (context, state) {
     final user = FirebaseAuth.instance.currentUser;
     final isLoggedIn = user != null;
-    final isAuthRoute = state.matchedLocation == '/login' || state.matchedLocation == '/register';
+    final isAuthRoute = state.matchedLocation == AppRoutes.login || state.matchedLocation == AppRoutes.register;
     
     // If not logged in and not on auth route, redirect to login
     if (!isLoggedIn && !isAuthRoute) {
-      return '/login';
+      return AppRoutes.login;
     }
     
     // If logged in and on auth route, redirect to home
     if (isLoggedIn && isAuthRoute) {
-      return '/';
+      return AppRoutes.home;
     }
     
     return null; // No redirect needed

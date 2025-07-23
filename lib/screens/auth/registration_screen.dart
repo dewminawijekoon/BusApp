@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/auth_provider.dart';
 import '../../config/constants.dart';
+import '../../config/app_routes.dart';
 import '../../utils/validators.dart';
 
 class RegistrationScreen extends StatefulWidget {
@@ -400,13 +401,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       _showSnackBar('Account created successfully! Welcome aboard!');
       
       // Navigate to main app
-      context.go('/');
+      context.go(AppRoutes.home);
     }
   }
 
   /// Navigate to login screen
   void _navigateToLogin() {
-    context.go('/login');
+    context.go(AppRoutes.login);
   }
 
   /// Show snackbar message

@@ -8,6 +8,7 @@ import '../../models/bus_stop_model.dart';
 import '../../providers/route_provider.dart';
 import '../../widgets/route/route_result_card.dart';
 import '../../widgets/common/loading_widget.dart';
+import '../../config/app_routes.dart';
 import '../../widgets/common/error_widget.dart' as custom;
 import '../../config/app_theme.dart';
 
@@ -49,7 +50,7 @@ class _RouteResultsScreenState extends State<RouteResultsScreen> {
 
   void _selectRoute(BusRoute route) {
     context.read<RouteProvider>().selectRoute(route);
-    context.go('/route-details', extra: {'route': route});
+    context.go(AppRoutes.routeDetails, extra: {'route': route});
   }
 
   void _saveRoute(BusRoute route) {

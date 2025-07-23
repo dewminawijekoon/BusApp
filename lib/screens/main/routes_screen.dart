@@ -3,12 +3,14 @@ import 'package:flutter/material.dart' as material show TimeOfDay;
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:go_router/go_router.dart';
 import '../../models/bus_route_model.dart';
 import '../../models/bus_stop_model.dart';
 import '../../providers/route_provider.dart';
 import '../../providers/location_provider.dart';
 import '../../widgets/route/route_result_card.dart';
 import '../../widgets/common/loading_widget.dart';
+import '../../config/app_routes.dart';
 
 class RoutesScreen extends StatefulWidget {
   const RoutesScreen({Key? key}) : super(key: key);
@@ -588,11 +590,7 @@ class _RoutesScreenState extends State<RoutesScreen>
   }
 
   void _navigateToRouteDetails(BusRoute route) {
-    // Navigate to route details screen
-    Navigator.pushNamed(
-      context,
-      '/route-details',
-      arguments: route,
-    );
+    // Navigate to route details screen using context.go
+    context.go(AppRoutes.routeDetails, extra: {'route': route});
   }
 }
