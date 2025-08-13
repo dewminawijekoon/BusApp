@@ -219,5 +219,24 @@ todo.md
 # Documentation build
 docs/_build/
 
+# Python Virtual Environments (Backend)
+.venv/
+venv/
+env/
+.env/
+ENV/
+env.bak/
+venv.bak/
+.python-version
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.coverage
+.pytest_cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
 # Keep these files (uncomment if you want to track them)
 # !pubspec.lock
