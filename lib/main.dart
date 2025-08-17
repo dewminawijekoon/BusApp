@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
-import 'firebase_options.dart';
+//import 'firebase_options.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/registration_screen.dart';
 import 'screens/main/main_navigation.dart';
@@ -28,14 +29,23 @@ import 'screens/main/alert_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
+    //options: DefaultFirebaseOptions.currentPlatform,
   );
   runApp(const TransitApp());
 }
 
-// GoRouter configuration
+// GoRouter configuration with auth state listener
+class AuthNotifier extends ChangeNotifier {
+  AuthNotifier() {
+    FirebaseAuth.instance.authStateChanges().listen((_) {
+      notifyListeners();
+    });
+  }
+}
+
 final GoRouter _router = GoRouter(
   initialLocation: AppRoutes.home,
+  refreshListenable: AuthNotifier(),
   routes: [
     // Shell route for main navigation
     ShellRoute(
@@ -173,16 +183,23 @@ final GoRouter _router = GoRouter(
         state.matchedLocation == AppRoutes.login ||
         state.matchedLocation == AppRoutes.register;
 
+    if (kDebugMode) {
+      print('GoRouter redirect: location=${state.matchedLocation}, isLoggedIn=$isLoggedIn, user=${user?.uid}');
+    }
+
     // If not logged in and not on auth route, redirect to login
     if (!isLoggedIn && !isAuthRoute) {
+      if (kDebugMode) print('Redirecting to login - not authenticated');
       return AppRoutes.login;
     }
 
     // If logged in and on auth route, redirect to home
     if (isLoggedIn && isAuthRoute) {
+      if (kDebugMode) print('Redirecting to home - authenticated on auth route');
       return AppRoutes.home;
     }
 
+    if (kDebugMode) print('No redirect needed');
     return null; // No redirect needed
   },
 );

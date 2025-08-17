@@ -471,11 +471,23 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
     try {
       final authProvider = context.read<AuthProvider>();
-      await authProvider.signIn(
+      print('Starting sign in process...');
+      
+      final success = await authProvider.signIn(
         _emailController.text.trim(),
         _passwordController.text,
       );
+      
+      print('Sign in completed. Success: $success');
+      
+      // Explicit navigation after successful authentication
+      if (success && mounted) {
+        print('Login successful, navigating to home...');
+        // Use replace instead of go to prevent back navigation to login
+        context.go(AppRoutes.home);
+      }
     } catch (e) {
+      print('Login error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

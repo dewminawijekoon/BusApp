@@ -459,39 +459,39 @@ class _HomeScreenState extends State<HomeScreen>
               ),
             ),
             TextButton(
-              onPressed: () => context.go(AppRoutes.savedRoutes),
+              onPressed: () => context.go(AppRoutes.routesPage),
               child: const Text('View All'),
             ),
           ],
         ),
         const SizedBox(height: 12),
         SizedBox(
-          height: 140,
+          height: 180, // Increased from 160 to 180 to fix overflow
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: 3,
             itemBuilder: (context, index) {
               return _RecentRouteCard(
                 from: index == 0
-                    ? 'Home'
+                    ? 'Nugegoda'
                     : index == 1
-                    ? 'Office'
-                    : 'Mall',
+                    ? 'Pettah'
+                    : 'Nugegoda',
                 to: index == 0
-                    ? 'Office'
+                    ? 'Pettah'
                     : index == 1
-                    ? 'Home'
-                    : 'Home',
+                    ? 'Wellawatha'
+                    : 'Pettah',
                 time: index == 0
-                    ? '8:30 AM'
+                    ? '7:30 AM'
                     : index == 1
-                    ? '5:45 PM'
-                    : '2:15 PM',
+                    ? '12:00 PM'
+                    : '8:15 AM',
                 duration: index == 0
-                    ? '35 min'
+                    ? '45 min'
                     : index == 1
-                    ? '42 min'
-                    : '28 min',
+                    ? '25 min'
+                    : '42 min',
                 onTap: () => _useRoute(index),
               );
             },
@@ -515,23 +515,27 @@ class _HomeScreenState extends State<HomeScreen>
           ),
         ),
         const SizedBox(height: 16),
-        ...List.generate(3, (index) {
-          return _LiveBusCard(
-            routeNumber: 'Route ${138 + index}',
-            destination: index == 0
-                ? 'Fort'
-                : index == 1
-                ? 'Nugegoda'
-                : 'Maharagama',
-            eta: '${5 + index * 3} min',
-            crowdLevel: index == 0
-                ? 'Low'
-                : index == 1
-                ? 'Medium'
-                : 'High',
-            onTrack: () => _trackBus(138 + index),
-          );
-        }),
+        _LiveBusCard(
+          routeNumber: '138',
+          destination: 'Maharahagama - Pettah',
+          eta: '5 min',
+          crowdLevel: 'Low',
+          onTrack: () => _trackBus(138),
+        ),
+        _LiveBusCard(
+          routeNumber: '122',
+          destination: 'Avissawella - Pettah',
+          eta: '8 min',
+          crowdLevel: 'Medium',
+          onTrack: () => _trackBus(122),
+        ),
+        _LiveBusCard(
+          routeNumber: '138',
+          destination: 'Kottawa - Pettah',
+          eta: '12 min',
+          crowdLevel: 'High',
+          onTrack: () => _trackBus(138),
+        ),
       ],
     );
   }
@@ -839,9 +843,10 @@ class _RecentRouteCard extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(20),
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(16), // Reduced from 20 to 16
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min, // Prevent column from expanding
               children: [
                 Row(
                   children: [
@@ -866,7 +871,7 @@ class _RecentRouteCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6), // Reduced from 8 to 6
                 Container(
                   margin: const EdgeInsets.only(left: 3),
                   width: 2,
@@ -881,7 +886,7 @@ class _RecentRouteCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(1),
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6), // Reduced from 8 to 6
                 Row(
                   children: [
                     Container(
@@ -905,7 +910,7 @@ class _RecentRouteCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                const Spacer(),
+                const SizedBox(height: 8), // Reduced from 10 to 8
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
