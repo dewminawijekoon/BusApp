@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AlertScreen extends StatefulWidget {
   const AlertScreen({Key? key}) : super(key: key);
@@ -47,6 +48,17 @@ class _AlertScreenState extends State<AlertScreen>
     super.dispose();
   }
 
+  AlertType _mapType(String? t) {
+    switch (t) {
+      case 'delay':
+        return AlertType.delay;
+      case 'warning':
+        return AlertType.warning;
+      default:
+        return AlertType.info;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -62,6 +74,7 @@ class _AlertScreenState extends State<AlertScreen>
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Refreshing alerts...')),
               );
+              // Firestore stream auto-refreshes; this is just UX feedback.
             },
           ),
         ],
@@ -74,12 +87,70 @@ class _AlertScreenState extends State<AlertScreen>
             padding: const EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 24.0),
             children: [
               const SizedBox(height: 12),
+
+              // ✅ NEW: Live alerts from Firestore appear at the top
+              StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('alerts')
+                    .orderBy('createdAt', descending: true)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    // Keep layout stable while loading
+                    return const SizedBox.shrink();
+                  }
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    // No dynamic alerts yet -> nothing to render here
+                    return const SizedBox.shrink();
+                  }
+
+                  final docs = snapshot.data!.docs;
+
+                  return Column(
+                    children: [
+                      // Optional spacing to separate dynamic & static sections
+                      for (final doc in docs) ...[
+                        _buildAlertCard(
+                          title:
+                              "Route ${(doc.data() as Map<String, dynamic>)['route'] ?? '-'} • ${(doc.data() as Map<String, dynamic>)['halt'] ?? '-'}",
+                          message:
+                              "Crowd: ${(doc.data() as Map<String, dynamic>)['crowd'] ?? '-'} | "
+                              "Status: ${(doc.data() as Map<String, dynamic>)['status'] ?? '-'} | "
+                              "ETA: ${(doc.data() as Map<String, dynamic>)['etaMins'] ?? 0} mins",
+                          type: _mapType(
+                            (doc.data() as Map<String, dynamic>)['type']
+                                as String?,
+                          ),
+                          timestamp:
+                              ((doc.data() as Map<String, dynamic>)['createdAt']
+                                      as Timestamp?)
+                                  ?.toDate() ??
+                              DateTime.now(),
+                          context: context,
+                        ),
+                        const SizedBox(height: 12),
+                      ],
+                      const Divider(height: 32),
+                    ],
+                  );
+                },
+              ),
+
+              // 🔷 Your original static messages (unchanged)
               _buildAlertCard(
                 title: 'Level Up! 🎉',
                 message:
                     'Congratulations! You have been upgraded to Silver Level from Bronze. Enjoy enhanced benefits and rewards!',
                 type: AlertType.info,
                 timestamp: DateTime.now().subtract(const Duration(minutes: 45)),
+                context: context,
+              ),
+              _buildAlertCard(
+                title: 'Bus Delay Notice 🚌⏳',
+                message:
+                    'The Colombo → Maharagama bus is running late by approximately 5 minutes. Please plan accordingly.',
+                type: AlertType.warning,
+                timestamp: DateTime.now(),
                 context: context,
               ),
               const SizedBox(height: 12),

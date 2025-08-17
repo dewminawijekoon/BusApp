@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/auth_provider.dart';
@@ -13,7 +14,7 @@ class RegistrationScreen extends StatefulWidget {
   State<RegistrationScreen> createState() => _RegistrationScreenState();
 }
 
-class _RegistrationScreenState extends State<RegistrationScreen> {
+class _RegistrationScreenState extends State<RegistrationScreen> with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -23,6 +24,39 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
   bool _acceptTerms = false;
+  
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeAnimations();
+  }
+
+  void _initializeAnimations() {
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 1200),
+      vsync: this,
+    );
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeOutCubic,
+      ),
+    );
+
+    _animationController.forward();
+  }
 
   @override
   void dispose() {
@@ -30,32 +64,52 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      body: SafeArea(
-        child: Consumer<AuthProvider>(
-          builder: (context, authProvider, child) {
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(AppConstants.defaultPadding),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const SizedBox(height: 40),
-                  _buildHeader(),
-                  const SizedBox(height: 32),
-                  _buildRegistrationForm(authProvider),
-                  const SizedBox(height: 24),
-                  _buildSignInPrompt(),
-                  const SizedBox(height: 20),
-                ],
-              ),
-            );
-          },
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              Theme.of(context).colorScheme.surface,
+              Theme.of(context).colorScheme.surface,
+            ],
+            stops: const [0.0, 0.3, 1.0],
+          ),
+        ),
+        child: SafeArea(
+          child: Consumer<AuthProvider>(
+            builder: (context, authProvider, child) {
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(AppConstants.defaultPadding),
+                child: FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: SlideTransition(
+                    position: _slideAnimation,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const SizedBox(height: 20),
+                        _buildHeader(),
+                        const SizedBox(height: 32),
+                        _buildRegistrationForm(authProvider),
+                        const SizedBox(height: 24),
+                        _buildSignInPrompt(),
+                        const SizedBox(height: 20),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
@@ -64,177 +118,217 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   Widget _buildHeader() {
     return Column(
       children: [
+        // Animated logo container
         Container(
-          width: 100,
-          height: 100,
+          width: 120,
+          height: 120,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primaryContainer,
-            borderRadius: BorderRadius.circular(50),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Theme.of(context).colorScheme.primary,
+                Theme.of(context).colorScheme.secondary,
+              ],
+            ),
+            borderRadius: BorderRadius.circular(30),
+            boxShadow: [
+              BoxShadow(
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
           ),
           child: Icon(
             Icons.person_add_rounded,
             size: 60,
-            color: Theme.of(context).colorScheme.onPrimaryContainer,
+            color: Colors.white,
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 32),
         Text(
           'Create Account',
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
             fontWeight: FontWeight.bold,
             color: Theme.of(context).colorScheme.onSurface,
+            fontSize: 28,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
         Text(
           'Join us for a better commute experience',
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
             color: Theme.of(context).colorScheme.onSurfaceVariant,
+            fontSize: 16,
           ),
+          textAlign: TextAlign.center,
         ),
       ],
     );
   }
 
   Widget _buildRegistrationForm(AuthProvider authProvider) {
-    return Form(
-      key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _buildNameField(),
-          const SizedBox(height: 16),
-          _buildEmailField(),
-          const SizedBox(height: 16),
-          _buildPasswordField(),
-          const SizedBox(height: 16),
-          _buildConfirmPasswordField(),
-          const SizedBox(height: 16),
-          _buildTermsCheckbox(),
-          const SizedBox(height: 32),
-          _buildRegisterButton(authProvider),
-          if (authProvider.errorMessage != null) ...[
-            const SizedBox(height: 16),
-            _buildErrorMessage(authProvider.errorMessage!),
-          ],
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
         ],
       ),
-    );
-  }
-
-  Widget _buildNameField() {
-    return TextFormField(
-      controller: _nameController,
-      textCapitalization: TextCapitalization.words,
-      textInputAction: TextInputAction.next,
-      decoration: InputDecoration(
-        labelText: 'Full Name',
-        hintText: 'Enter your full name',
-        prefixIcon: const Icon(Icons.person_outline),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppConstants.buttonBorderRadius),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Name Field
+            _buildTextField(
+              controller: _nameController,
+              label: 'Full Name',
+              hint: 'Enter your full name',
+              prefixIcon: Icons.person_outline,
+              validator: Validators.validateName,
+            ),
+            const SizedBox(height: 20),
+            
+            // Email Field
+            _buildTextField(
+              controller: _emailController,
+              label: 'Email',
+              hint: 'Enter your email',
+              prefixIcon: Icons.email_outlined,
+              keyboardType: TextInputType.emailAddress,
+              validator: Validators.validateEmail,
+            ),
+            const SizedBox(height: 20),
+            
+            // Password Field
+            _buildTextField(
+              controller: _passwordController,
+              label: 'Password',
+              hint: 'Create a password',
+              prefixIcon: Icons.lock_outline,
+              isPassword: true,
+              validator: Validators.validatePassword,
+            ),
+            const SizedBox(height: 20),
+            
+            // Confirm Password Field
+            _buildTextField(
+              controller: _confirmPasswordController,
+              label: 'Confirm Password',
+              hint: 'Confirm your password',
+              prefixIcon: Icons.lock_outline,
+              isPassword: true,
+              isConfirmPassword: true,
+              validator: (value) => Validators.validateConfirmPassword(
+                value,
+                _passwordController.text,
+              ),
+            ),
+            const SizedBox(height: 24),
+            
+            // Terms and Conditions
+            _buildTermsCheckbox(),
+            const SizedBox(height: 32),
+            
+            // Register Button
+            _buildRegisterButton(authProvider),
+          ],
         ),
       ),
-      validator: (value) => Validators.validateName(value),
-      onChanged: (value) {
-        // Clear error when user starts typing
-        if (context.read<AuthProvider>().errorMessage != null) {
-          context.read<AuthProvider>().clearError();
-        }
-      },
     );
   }
 
-  Widget _buildEmailField() {
-    return TextFormField(
-      controller: _emailController,
-      keyboardType: TextInputType.emailAddress,
-      textInputAction: TextInputAction.next,
-      decoration: InputDecoration(
-        labelText: 'Email',
-        hintText: 'Enter your email',
-        prefixIcon: const Icon(Icons.email_outlined),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppConstants.buttonBorderRadius),
-        ),
-      ),
-      validator: (value) => Validators.validateEmail(value),
-      onChanged: (value) {
-        // Clear error when user starts typing
-        if (context.read<AuthProvider>().errorMessage != null) {
-          context.read<AuthProvider>().clearError();
-        }
-      },
-    );
-  }
-
-  Widget _buildPasswordField() {
-    return TextFormField(
-      controller: _passwordController,
-      obscureText: !_isPasswordVisible,
-      textInputAction: TextInputAction.next,
-      decoration: InputDecoration(
-        labelText: 'Password',
-        hintText: 'Enter your password',
-        prefixIcon: const Icon(Icons.lock_outline),
-        suffixIcon: IconButton(
-          icon: Icon(
-            _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required IconData prefixIcon,
+    bool isPassword = false,
+    bool isConfirmPassword = false,
+    TextInputType? keyboardType,
+    String? Function(String?)? validator,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
-          onPressed: () {
-            setState(() {
-              _isPasswordVisible = !_isPasswordVisible;
-            });
-          },
         ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppConstants.buttonBorderRadius),
-        ),
-      ),
-      validator: (value) => Validators.validatePassword(value),
-      onChanged: (value) {
-        // Clear error when user starts typing
-        if (context.read<AuthProvider>().errorMessage != null) {
-          context.read<AuthProvider>().clearError();
-        }
-      },
-    );
-  }
-
-  Widget _buildConfirmPasswordField() {
-    return TextFormField(
-      controller: _confirmPasswordController,
-      obscureText: !_isConfirmPasswordVisible,
-      textInputAction: TextInputAction.done,
-      decoration: InputDecoration(
-        labelText: 'Confirm Password',
-        hintText: 'Confirm your password',
-        prefixIcon: const Icon(Icons.lock_outline),
-        suffixIcon: IconButton(
-          icon: Icon(
-            _isConfirmPasswordVisible ? Icons.visibility_off : Icons.visibility,
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: controller,
+          keyboardType: keyboardType,
+          obscureText: isPassword && !(isConfirmPassword ? _isConfirmPasswordVisible : _isPasswordVisible),
+          validator: validator,
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.6),
+            ),
+            prefixIcon: Icon(
+              prefixIcon,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            suffixIcon: isPassword
+                ? IconButton(
+                    icon: Icon(
+                      (isConfirmPassword ? _isConfirmPasswordVisible : _isPasswordVisible) 
+                          ? Icons.visibility_off 
+                          : Icons.visibility,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        if (isConfirmPassword) {
+                          _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+                        } else {
+                          _isPasswordVisible = !_isPasswordVisible;
+                        }
+                      });
+                    },
+                  )
+                : null,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.primary,
+                width: 2,
+              ),
+            ),
+            filled: true,
+            fillColor: Theme.of(context).colorScheme.surface,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 16,
+            ),
           ),
-          onPressed: () {
-            setState(() {
-              _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
-            });
-          },
         ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppConstants.buttonBorderRadius),
-        ),
-      ),
-      validator: (value) => Validators.validateConfirmPassword(
-        value,
-        _passwordController.text,
-      ),
-      onChanged: (value) {
-        // Clear error when user starts typing
-        if (context.read<AuthProvider>().errorMessage != null) {
-          context.read<AuthProvider>().clearError();
-        }
-      },
-      onFieldSubmitted: (_) => _handleRegistration(),
+      ],
     );
   }
 
@@ -242,46 +336,67 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Checkbox(
-          value: _acceptTerms,
-          onChanged: (value) {
-            setState(() {
-              _acceptTerms = value ?? false;
-            });
-          },
-        ),
-        Expanded(
-          child: GestureDetector(
-            onTap: () {
+        SizedBox(
+          height: 24,
+          width: 24,
+          child: Checkbox(
+            value: _acceptTerms,
+            onChanged: (value) {
               setState(() {
-                _acceptTerms = !_acceptTerms;
+                _acceptTerms = value ?? false;
               });
             },
-            child: Padding(
-              padding: const EdgeInsets.only(top: 12),
-              child: RichText(
-                text: TextSpan(
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  children: [
-                    const TextSpan(text: 'I agree to the '),
-                    TextSpan(
-                      text: 'Terms of Service',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const TextSpan(text: ' and '),
-                    TextSpan(
-                      text: 'Privacy Policy',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
+            activeColor: Theme.of(context).colorScheme.primary,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: RichText(
+            text: TextSpan(
+              style: TextStyle(
+                fontSize: 14,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                height: 1.4,
               ),
+              children: [
+                const TextSpan(text: 'I agree to the '),
+                TextSpan(
+                  text: 'Terms of Service',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () {
+                      // TODO: Navigate to Terms of Service
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Terms of Service coming soon!'),
+                        ),
+                      );
+                    },
+                ),
+                const TextSpan(text: ' and '),
+                TextSpan(
+                  text: 'Privacy Policy',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () {
+                      // TODO: Navigate to Privacy Policy
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Privacy Policy coming soon!'),
+                        ),
+                      );
+                    },
+                ),
+              ],
             ),
           ),
         ),
@@ -290,17 +405,32 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   }
 
   Widget _buildRegisterButton(AuthProvider authProvider) {
-    return SizedBox(
+    return Container(
       height: 56,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Theme.of(context).colorScheme.primary,
+            Theme.of(context).colorScheme.secondary,
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
       child: ElevatedButton(
         onPressed: authProvider.isLoading ? null : _handleRegistration,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          foregroundColor: Theme.of(context).colorScheme.onPrimary,
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppConstants.buttonBorderRadius),
+            borderRadius: BorderRadius.circular(16),
           ),
-          elevation: 2,
         ),
         child: authProvider.isLoading
             ? SizedBox(
@@ -309,13 +439,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
                   valueColor: AlwaysStoppedAnimation<Color>(
-                    Theme.of(context).colorScheme.onPrimary,
+                    Colors.white,
                   ),
                 ),
               )
-            : const Text(
+            : Text(
                 'Create Account',
                 style: TextStyle(
+                  color: Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
@@ -325,48 +456,35 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   }
 
   Widget _buildSignInPrompt() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          "Already have an account? ",
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
-        TextButton(
-          onPressed: _navigateToLogin,
-          child: Text(
-            'Sign In',
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.primary,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildErrorMessage(String message) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.errorContainer,
-        borderRadius: BorderRadius.circular(AppConstants.buttonBorderRadius),
+        color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.5),
+        ),
       ),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.error_outline,
-            color: Theme.of(context).colorScheme.onErrorContainer,
-            size: 20,
+          Text(
+            'Already have an account? ',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              fontSize: 14,
+            ),
           ),
-          const SizedBox(width: 8),
-          Expanded(
+          TextButton(
+            onPressed: () {
+              context.go(AppRoutes.login);
+            },
             child: Text(
-              message,
+              'Sign In',
               style: TextStyle(
-                color: Theme.of(context).colorScheme.onErrorContainer,
+                color: Theme.of(context).colorScheme.primary,
                 fontSize: 14,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),
@@ -375,55 +493,37 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
 
-  /// Handle registration form submission
   Future<void> _handleRegistration() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
     if (!_acceptTerms) {
-      _showSnackBar(
-        'Please accept the Terms of Service and Privacy Policy',
-        isError: true,
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Please accept the Terms of Service and Privacy Policy'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
       );
       return;
     }
 
-    final authProvider = context.read<AuthProvider>();
-    final success = await authProvider.signUp(
-      _emailController.text.trim(),
-      _passwordController.text,
-      _nameController.text.trim(),
-    );
-
-    if (success && mounted) {
-      // Show success message
-      _showSnackBar('Account created successfully! Welcome aboard!');
-      
-      // Navigate to main app
-      context.go(AppRoutes.home);
+    try {
+      final authProvider = context.read<AuthProvider>();
+      await authProvider.signUp(
+        _emailController.text.trim(),
+        _passwordController.text,
+        _nameController.text.trim(),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Registration failed: ${e.toString()}'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
     }
-  }
-
-  /// Navigate to login screen
-  void _navigateToLogin() {
-    context.go(AppRoutes.login);
-  }
-
-  /// Show snackbar message
-  void _showSnackBar(String message, {bool isError = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isError
-            ? Theme.of(context).colorScheme.error
-            : Theme.of(context).colorScheme.primary,
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(AppConstants.defaultPadding),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppConstants.buttonBorderRadius),
-        ),
-      ),
-    );
   }
 }

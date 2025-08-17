@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import '../../models/bus_route_model.dart';
 import '../../providers/user_provider.dart';
 import '../../providers/route_provider.dart';
 import '../../config/app_theme.dart';
+import '../../config/app_routes.dart';
 
 class SavedRoutesScreen extends StatefulWidget {
   const SavedRoutesScreen({super.key});
@@ -88,14 +90,25 @@ class _SavedRoutesScreenState extends State<SavedRoutesScreen> {
   }
 
   Widget _buildSavedRouteCard(BusRoute route) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      elevation: 2,
+      margin: EdgeInsets.zero,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: colorScheme.outline.withOpacity(0.12),
+          width: 1,
+        ),
+      ),
+      color: colorScheme.surface,
       child: InkWell(
         onTap: () => _useRoute(route),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -107,23 +120,27 @@ class _SavedRoutesScreenState extends State<SavedRoutesScreen> {
                       children: [
                         Text(
                           route.routeName,
-                          style: Theme.of(context).textTheme.titleMedium
-                              ?.copyWith(fontWeight: FontWeight.w600),
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: colorScheme.onSurface,
+                          ),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 6),
                         Row(
                           children: [
                             Icon(
                               Icons.location_on_outlined,
                               size: 16,
-                              color: AppTheme.primaryColor,
+                              color: colorScheme.primary,
                             ),
-                            const SizedBox(width: 4),
+                            const SizedBox(width: 6),
                             Expanded(
                               child: Text(
                                 '${route.stops.first.stopName} → ${route.stops.last.stopName}',
-                                style: Theme.of(context).textTheme.bodyMedium
-                                    ?.copyWith(color: Colors.grey[600]),
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: colorScheme.onSurface.withOpacity(0.7),
+                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ],
@@ -139,51 +156,57 @@ class _SavedRoutesScreenState extends State<SavedRoutesScreen> {
                         _showDeleteDialog(route);
                       }
                     },
+                    icon: Icon(
+                      Icons.more_vert,
+                      color: colorScheme.onSurface.withOpacity(0.6),
+                    ),
                     itemBuilder: (context) => [
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'use',
                         child: Row(
                           children: [
-                            Icon(Icons.navigation_outlined),
-                            SizedBox(width: 12),
-                            Text('Use Route'),
+                            Icon(Icons.navigation_outlined, color: colorScheme.primary),
+                            const SizedBox(width: 12),
+                            Text('Use Route', style: TextStyle(color: colorScheme.onSurface)),
                           ],
                         ),
                       ),
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'delete',
                         child: Row(
                           children: [
-                            Icon(Icons.delete_outline, color: Colors.red),
-                            SizedBox(width: 12),
-                            Text('Delete', style: TextStyle(color: Colors.red)),
+                            Icon(Icons.delete_outline, color: colorScheme.error),
+                            const SizedBox(width: 12),
+                            Text('Delete', style: TextStyle(color: colorScheme.error)),
                           ],
                         ),
                       ),
                     ],
-                    child: const Icon(Icons.more_vert),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               Row(
                 children: [
                   _buildInfoChip(
                     icon: Icons.access_time_outlined,
                     label: '${route.estimatedDuration.inMinutes} min',
-                    color: AppTheme.primaryColor.withOpacity(0.1),
+                    color: colorScheme.primary.withOpacity(0.1),
+                    textColor: colorScheme.primary,
                   ),
                   const SizedBox(width: 8),
                   _buildInfoChip(
                     icon: Icons.directions_bus_outlined,
                     label: '${route.stops.length} stops',
-                    color: AppTheme.secondaryColor.withOpacity(0.1),
+                    color: colorScheme.secondary.withOpacity(0.1),
+                    textColor: colorScheme.secondary,
                   ),
                   const SizedBox(width: 8),
                   _buildInfoChip(
                     icon: Icons.currency_rupee,
                     label: '${route.baseFare.toStringAsFixed(0)}',
-                    color: AppTheme.accentColor.withOpacity(0.1),
+                    color: colorScheme.tertiary.withOpacity(0.1),
+                    textColor: colorScheme.tertiary,
                   ),
                 ],
               ),
@@ -198,23 +221,25 @@ class _SavedRoutesScreenState extends State<SavedRoutesScreen> {
     required IconData icon,
     required String label,
     required Color color,
+    required Color textColor,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: color,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14),
+          Icon(icon, size: 16, color: textColor),
           const SizedBox(width: 4),
           Text(
             label,
-            style: Theme.of(
-              context,
-            ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w500),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: textColor,
+            ),
           ),
         ],
       ),
@@ -222,14 +247,35 @@ class _SavedRoutesScreenState extends State<SavedRoutesScreen> {
   }
 
   void _showDeleteDialog(BusRoute route) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Route'),
-        content: Text('Are you sure you want to delete "${route.routeName}"?'),
+        backgroundColor: colorScheme.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Text(
+          'Delete Route',
+          style: theme.textTheme.titleLarge?.copyWith(
+            color: colorScheme.onSurface,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        content: Text(
+          'Are you sure you want to delete "${route.routeName}"?',
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: colorScheme.onSurface.withOpacity(0.8),
+          ),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
+            style: TextButton.styleFrom(
+              foregroundColor: colorScheme.onSurface.withOpacity(0.7),
+            ),
             child: const Text('Cancel'),
           ),
           TextButton(
@@ -237,7 +283,9 @@ class _SavedRoutesScreenState extends State<SavedRoutesScreen> {
               Navigator.of(context).pop();
               _deleteRoute(route.id);
             },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(
+              foregroundColor: colorScheme.error,
+            ),
             child: const Text('Delete'),
           ),
         ],
@@ -246,61 +294,80 @@ class _SavedRoutesScreenState extends State<SavedRoutesScreen> {
   }
 
   Widget _buildEmptyState() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.bookmark_border_outlined,
-            size: 80,
-            color: Colors.grey[400],
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'No Saved Routes',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              color: Colors.grey[600],
-              fontWeight: FontWeight.w500,
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.bookmark_border_outlined,
+              size: 80,
+              color: colorScheme.onSurface.withOpacity(0.4),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Save your frequently used routes for quick access',
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: Colors.grey[500]),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 24),
-          ElevatedButton.icon(
-            onPressed: () {
-              // Using GoRouter navigation instead of Navigator.pushNamed
-              // Navigator.pushNamed(context, '/routes');
-
-              // For now, just show a message
-              _showSuccessSnackBar('Route search feature coming soon!');
-            },
-            icon: const Icon(Icons.search),
-            label: const Text('Find Routes'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.primaryColor,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            const SizedBox(height: 16),
+            Text(
+              'No Saved Routes',
+              style: theme.textTheme.headlineSmall?.copyWith(
+                color: colorScheme.onSurface,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
-        ],
+            const SizedBox(height: 8),
+            Text(
+              'Save your frequently used routes for quick access',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurface.withOpacity(0.7),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: () {
+                context.go(AppRoutes.routesPage);
+              },
+              icon: const Icon(Icons.search),
+              label: const Text('Find Routes'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: colorScheme.primary,
+                foregroundColor: colorScheme.onPrimary,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Saved Routes'),
-        backgroundColor: AppTheme.primaryColor,
+        title: Text(
+          'Saved Routes',
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: colorScheme.primary,
         foregroundColor: Colors.white,
-        elevation: 2,
+        elevation: 0,
+        leading: IconButton(
+          onPressed: () => context.go(AppRoutes.routesPage),
+          icon: const Icon(Icons.arrow_back),
+          tooltip: 'Back to Routes',
+        ),
         actions: [
           if (_savedRoutes.isNotEmpty)
             IconButton(
@@ -310,17 +377,26 @@ class _SavedRoutesScreenState extends State<SavedRoutesScreen> {
             ),
         ],
       ),
+      backgroundColor: colorScheme.surface,
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(
+              child: CircularProgressIndicator(
+                color: colorScheme.primary,
+              ),
+            )
           : _savedRoutes.isEmpty
           ? _buildEmptyState()
           : RefreshIndicator(
+              color: colorScheme.primary,
               onRefresh: _loadSavedRoutes,
               child: ListView.builder(
-                padding: const EdgeInsets.symmetric(vertical: 8),
+                padding: const EdgeInsets.all(16),
                 itemCount: _savedRoutes.length,
                 itemBuilder: (context, index) {
-                  return _buildSavedRouteCard(_savedRoutes[index]);
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: _buildSavedRouteCard(_savedRoutes[index]),
+                  );
                 },
               ),
             ),

@@ -19,33 +19,78 @@ class _AccountScreenState extends State<AccountScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
+      backgroundColor: colorScheme.surface,
       body: Consumer2<AuthProvider, UserProvider>(
         builder: (context, authProvider, userProvider, child) {
           final userProfile = userProvider.currentUser;
           
           // Show loading while checking authentication
           if (authProvider.status == AuthStatus.unknown || authProvider.status == AuthStatus.loading) {
-            return const Center(
-              child: CircularProgressIndicator(),
+            return Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    colorScheme.primary.withOpacity(0.1),
+                    colorScheme.surface,
+                  ],
+                ),
+              ),
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
             );
           }
           
           // Check if user is authenticated
           if (authProvider.status == AuthStatus.unauthenticated || !authProvider.isAuthenticated) {
-            return const Center(
-              child: Text('Please log in to view your account'),
+            return Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    colorScheme.primary.withOpacity(0.1),
+                    colorScheme.surface,
+                  ],
+                ),
+              ),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Symbols.account_circle,
+                      size: 64,
+                      color: colorScheme.onSurface.withOpacity(0.5),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Please log in to view your account',
+                      style: TextStyle(
+                        color: colorScheme.onSurface.withOpacity(0.7),
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             );
           }
 
           return CustomScrollView(
             slivers: [
-              // Custom App Bar with Profile Header
+              // Enhanced App Bar with Profile Header
               SliverAppBar(
-                expandedHeight: 280.0, // Further increased height to eliminate remaining overflow
+                expandedHeight: 320.0,
                 pinned: true,
-                backgroundColor: AppTheme.primaryColor,
+                backgroundColor: colorScheme.surface,
+                surfaceTintColor: colorScheme.surfaceTint,
+                elevation: 0,
                 flexibleSpace: FlexibleSpaceBar(
                   background: _buildProfileHeader(
                     userProfile ?? authProvider.currentUser ?? UserModel(
@@ -59,20 +104,41 @@ class _AccountScreenState extends State<AccountScreen> {
                     )
                   ),
                 ),
-                title: Text(
-                  'Account',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
+                title: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surface.withOpacity(0.9),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: colorScheme.outline.withOpacity(0.2),
+                    ),
+                  ),
+                  child: Text(
+                    'Account',
+                    style: TextStyle(
+                      color: colorScheme.onSurface,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
                 actions: [
-                  IconButton(
-                    icon: Icon(
-                      Symbols.edit,
-                      color: Colors.white,
+                  Container(
+                    margin: const EdgeInsets.only(right: 8),
+                    decoration: BoxDecoration(
+                      color: colorScheme.surface.withOpacity(0.9),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: colorScheme.outline.withOpacity(0.2),
+                      ),
                     ),
-                    onPressed: () => _navigateToEditProfile(context),
+                    child: IconButton(
+                      icon: Icon(
+                        Symbols.edit,
+                        color: colorScheme.primary,
+                      ),
+                      onPressed: () => _navigateToEditProfile(context),
+                    ),
                   ),
                 ],
               ),
@@ -80,13 +146,13 @@ class _AccountScreenState extends State<AccountScreen> {
               // Menu Options
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(24.0),
                   child: Column(
                     children: [
                       _buildMenuSection(),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 32),
                       _buildAppSection(),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 32),
                       _buildDangerSection(context, authProvider),
                     ],
                   ),
@@ -100,75 +166,127 @@ class _AccountScreenState extends State<AccountScreen> {
   }
 
   Widget _buildProfileHeader(UserModel user) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return LayoutBuilder(
       builder: (context, constraints) {
         return Container(
           width: double.infinity,
-          height: constraints.maxHeight, // Ensure it matches the FlexibleSpaceBar's height
-          padding: const EdgeInsets.fromLTRB(16, 80, 16, 20),
+          height: constraints.maxHeight,
+          padding: const EdgeInsets.fromLTRB(24, 80, 24, 24),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
               colors: [
-                AppTheme.primaryColor,
-                AppTheme.primaryColor.withOpacity(0.8),
+                colorScheme.primary,
+                colorScheme.secondary,
+                colorScheme.primary.withOpacity(0.8),
               ],
+              stops: const [0.0, 0.5, 1.0],
             ),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             mainAxisSize: MainAxisSize.max,
             children: [
-              CircleAvatar(
-                radius: 28,
-                backgroundColor: Colors.white.withOpacity(0.2),
-                child: Icon(
-                  Symbols.person,
-                  size: 28,
-                  color: Colors.white,
+              // Profile Avatar
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.3),
+                    width: 2,
+                  ),
+                ),
+                child: CircleAvatar(
+                  radius: 32,
+                  backgroundColor: Colors.white.withOpacity(0.9),
+                  child: Icon(
+                    Symbols.person,
+                    size: 32,
+                    color: colorScheme.primary,
+                  ),
                 ),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 16),
+              
+              // User Name
               Text(
                 user.name.isNotEmpty ? user.name : 'Guest User',
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 18,
+                  fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
+                textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 1),
+              const SizedBox(height: 8),
+              
+              // User Email
               Text(
-                user.email.isNotEmpty ? user.email : 'No email',
+                user.email.isNotEmpty ? user.email : 'guest@example.com',
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.8),
-                  fontSize: 13,
+                  color: Colors.white.withOpacity(0.9),
+                  fontSize: 14,
                 ),
+                textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 20),
+              
+              // Points Card
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(14),
+                  color: Colors.white.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.2),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
                 ),
                 child: Row(
-                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Symbols.star,
-                      size: 14,
-                      color: Colors.white,
-                    ),
-                    const SizedBox(width: 3),
-                    Text(
-                      '${user.points} Points',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13,
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12),
                       ),
+                      child: Icon(
+                        Symbols.star,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Column(
+                      children: [
+                        Text(
+                          '${user.points}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          'Points',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.8),
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -181,10 +299,30 @@ class _AccountScreenState extends State<AccountScreen> {
   }
 
   Widget _buildMenuSection() {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+    final colorScheme = Theme.of(context).colorScheme;
+    
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            colorScheme.surface,
+            colorScheme.surface.withOpacity(0.8),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: colorScheme.outline.withOpacity(0.2),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         children: [
@@ -221,10 +359,30 @@ class _AccountScreenState extends State<AccountScreen> {
   }
 
   Widget _buildAppSection() {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+    final colorScheme = Theme.of(context).colorScheme;
+    
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            colorScheme.surface,
+            colorScheme.surface.withOpacity(0.8),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: colorScheme.outline.withOpacity(0.2),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         children: [
@@ -261,15 +419,30 @@ class _AccountScreenState extends State<AccountScreen> {
   }
 
   Widget _buildDangerSection(BuildContext context, AuthProvider authProvider) {
-    return Card(
-      elevation: 2,
-      color: Colors.red.shade50, // Light red background instead of dark
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(
-          color: Colors.red.shade200, // Lighter border color
+    final colorScheme = Theme.of(context).colorScheme;
+    
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.red.shade50,
+            Colors.red.shade50.withOpacity(0.8),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: Colors.red.shade200,
           width: 1,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.red.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         children: [
@@ -277,16 +450,8 @@ class _AccountScreenState extends State<AccountScreen> {
             icon: Symbols.logout,
             title: 'Sign Out',
             subtitle: 'Sign out of your account',
-            titleColor: Colors.red.shade700, // Better contrast red
+            titleColor: Colors.red.shade700,
             onTap: () => _handleSignOut(context, authProvider),
-          ),
-          _buildDivider(),
-          _buildMenuTile(
-            icon: Symbols.delete_forever,
-            title: 'Delete Account',
-            subtitle: 'Permanently delete your account',
-            titleColor: Colors.red.shade700, // Better contrast red
-            onTap: () => _showDeleteAccountDialog(context),
           ),
         ],
       ),
@@ -300,51 +465,95 @@ class _AccountScreenState extends State<AccountScreen> {
     required VoidCallback onTap,
     Color? titleColor,
   }) {
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      leading: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: titleColor != null 
-              ? titleColor.withOpacity(0.1) 
-              : AppTheme.primaryColor.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Icon(
-          icon,
-          color: titleColor ?? AppTheme.primaryColor,
-          size: 24,
+    final colorScheme = Theme.of(context).colorScheme;
+    
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      (titleColor ?? colorScheme.primary).withOpacity(0.1),
+                      (titleColor ?? colorScheme.primary).withOpacity(0.05),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: (titleColor ?? colorScheme.primary).withOpacity(0.2),
+                  ),
+                ),
+                child: Icon(
+                  icon,
+                  color: titleColor ?? colorScheme.primary,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                        color: titleColor ?? colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        color: colorScheme.onSurface.withOpacity(0.7),
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: colorScheme.onSurface.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Symbols.chevron_right,
+                  color: colorScheme.onSurface.withOpacity(0.6),
+                  size: 20,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-      title: Text(
-        title,
-        style: TextStyle(
-          fontWeight: FontWeight.w600,
-          fontSize: 16,
-          color: titleColor,
-        ),
-      ),
-      subtitle: Text(
-        subtitle,
-        style: TextStyle(
-          color: Colors.grey[600],
-          fontSize: 14,
-        ),
-      ),
-      trailing: Icon(
-        Symbols.chevron_right,
-        color: Colors.grey[400],
-      ),
-      onTap: onTap,
     );
   }
 
   Widget _buildDivider() {
-    return Divider(
+    final colorScheme = Theme.of(context).colorScheme;
+    
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20),
       height: 1,
-      indent: 68,
-      endIndent: 20,
-      color: Colors.grey[300],
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Colors.transparent,
+            colorScheme.outline.withOpacity(0.2),
+            Colors.transparent,
+          ],
+        ),
+      ),
     );
   }
 

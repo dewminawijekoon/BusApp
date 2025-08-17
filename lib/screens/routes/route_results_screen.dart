@@ -13,14 +13,14 @@ import '../../widgets/common/error_widget.dart' as custom;
 import '../../config/app_theme.dart';
 
 class RouteResultsScreen extends StatefulWidget {
-  final BusStop startStop;
-  final BusStop endStop;
+  final BusStop? startStop;
+  final BusStop? endStop;
   final DateTime? travelDateTime;
 
   const RouteResultsScreen({
     super.key,
-    required this.startStop,
-    required this.endStop,
+    this.startStop,
+    this.endStop,
     this.travelDateTime,
   });
 
@@ -41,11 +41,13 @@ class _RouteResultsScreenState extends State<RouteResultsScreen> {
   }
 
   void _searchRoutes() {
-    context.read<RouteProvider>().searchRoutes(
-      startStop: widget.startStop,
-      endStop: widget.endStop,
-      departureTime: widget.travelDateTime,
-    );
+    if (widget.startStop != null && widget.endStop != null) {
+      context.read<RouteProvider>().searchRoutes(
+        startStop: widget.startStop!,
+        endStop: widget.endStop!,
+        departureTime: widget.travelDateTime,
+      );
+    }
   }
 
   void _selectRoute(BusRoute route) {
@@ -230,7 +232,7 @@ class _RouteResultsScreenState extends State<RouteResultsScreen> {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  widget.startStop.name,
+                  widget.startStop?.name ?? 'Select Start Location',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
@@ -265,7 +267,7 @@ class _RouteResultsScreenState extends State<RouteResultsScreen> {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  widget.endStop.name,
+                  widget.endStop?.name ?? 'Select End Location',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
