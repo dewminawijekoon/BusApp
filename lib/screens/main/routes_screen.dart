@@ -133,257 +133,240 @@ class _RoutesScreenState extends State<RoutesScreen>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.surface,
-      body: Column(
-        children: [
-          // Search Header
-          Container(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surface,
-              boxShadow: [
-                BoxShadow(
-                  color: theme.colorScheme.onSurface.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 2),
+      backgroundColor: colorScheme.surface,
+      body: CustomScrollView(
+        slivers: [
+          // Enhanced App Bar
+          SliverAppBar(
+            expandedHeight: 140,
+            floating: true,
+            snap: true,
+            backgroundColor: colorScheme.surface,
+            surfaceTintColor: colorScheme.surfaceTint,
+            elevation: 0,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      colorScheme.primary.withOpacity(0.1),
+                      colorScheme.secondary.withOpacity(0.05),
+                    ],
+                  ),
                 ),
-              ],
-            ),
-            child: Column(
-              children: [
-                // Main search card
-                Card(
-                  elevation: 0,
-                  color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      children: [
-                        // From field
-                        Row(
-                          children: [
-                            Icon(
-                              Symbols.trip_origin,
-                              color: theme.colorScheme.primary,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: TextField(
-                                controller: _fromController,
-                                decoration: InputDecoration(
-                                  hintText: 'From where?',
-                                  border: InputBorder.none,
-                                  hintStyle: TextStyle(
-                                    color: theme.colorScheme.onSurface
-                                        .withOpacity(0.6),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: _useCurrentLocation,
-                              icon: const Icon(Symbols.my_location),
-                              iconSize: 20,
-                            ),
-                          ],
-                        ),
-
-                        // Divider with swap button
-                        Row(
-                          children: [
-                            const SizedBox(width: 32),
-                            Expanded(
-                              child: Divider(
-                                color: theme.colorScheme.onSurface.withOpacity(
-                                  0.2,
-                                ),
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: _swapLocations,
-                              icon: const Icon(Symbols.swap_vert),
-                              iconSize: 20,
-                            ),
-                            Expanded(
-                              child: Divider(
-                                color: theme.colorScheme.onSurface.withOpacity(
-                                  0.2,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        // To field
-                        Row(
-                          children: [
-                            Icon(
-                              Symbols.location_on,
-                              color: theme.colorScheme.error,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: TextField(
-                                controller: _toController,
-                                decoration: InputDecoration(
-                                  hintText: 'Where to?',
-                                  border: InputBorder.none,
-                                  hintStyle: TextStyle(
-                                    color: theme.colorScheme.onSurface
-                                        .withOpacity(0.6),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 16),
-
-                        // Date and time selection
-                        AnimatedSize(
-                          duration: const Duration(milliseconds: 200),
-                          child: _isSearchExpanded
-                              ? Column(
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: InkWell(
-                                            onTap: () => _selectDate(context),
-                                            child: Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    vertical: 12,
-                                                    horizontal: 16,
-                                                  ),
-                                              decoration: BoxDecoration(
-                                                border: Border.all(
-                                                  color: theme
-                                                      .colorScheme
-                                                      .outline
-                                                      .withOpacity(0.3),
-                                                ),
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                              ),
-                                              child: Row(
-                                                children: [
-                                                  const Icon(
-                                                    Symbols.calendar_today,
-                                                    size: 16,
-                                                  ),
-                                                  const SizedBox(width: 8),
-                                                  Text(
-                                                    _selectedDate != null
-                                                        ? '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}'
-                                                        : 'Select Date',
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 12),
-                                        Expanded(
-                                          child: InkWell(
-                                            onTap: () => _selectTime(context),
-                                            child: Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    vertical: 12,
-                                                    horizontal: 16,
-                                                  ),
-                                              decoration: BoxDecoration(
-                                                border: Border.all(
-                                                  color: theme
-                                                      .colorScheme
-                                                      .outline
-                                                      .withOpacity(0.3),
-                                                ),
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                              ),
-                                              child: Row(
-                                                children: [
-                                                  const Icon(
-                                                    Symbols.schedule,
-                                                    size: 16,
-                                                  ),
-                                                  const SizedBox(width: 8),
-                                                  Text(
-                                                    _selectedTime != null
-                                                        ? _selectedTime!.format(
-                                                            context,
-                                                          )
-                                                        : 'Select Time',
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 16),
-                                  ],
-                                )
-                              : const SizedBox.shrink(),
-                        ),
-
-                        // Search button
-                        SizedBox(
-                          width: double.infinity,
-                          child: FilledButton.icon(
-                            onPressed: _handleSearch,
-                            icon: const Icon(Symbols.search),
-                            label: const Text('Search Routes'),
-                          ),
-                        ),
-
-                        // Expand/Collapse button
-                        TextButton.icon(
-                          onPressed: () {
-                            setState(() {
-                              _isSearchExpanded = !_isSearchExpanded;
-                            });
-                          },
-                          icon: Icon(
-                            _isSearchExpanded
-                                ? Symbols.expand_less
-                                : Symbols.expand_more,
-                            size: 16,
-                          ),
-                          label: Text(
-                            _isSearchExpanded ? 'Less options' : 'More options',
-                          ),
+              ),
+              title: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          colorScheme.primary,
+                          colorScheme.secondary,
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: colorScheme.primary.withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
                         ),
                       ],
                     ),
+                    child: Icon(
+                      Symbols.route,
+                      color: Colors.white,
+                      size: 24,
+                    ),
                   ),
-                ),
-
-                // Tab bar
-                const SizedBox(height: 8),
-                TabBar(
-                  controller: _tabController,
-                  tabs: const [
-                    Tab(text: 'Search Results'),
-                    Tab(text: 'Popular Routes'),
-                    Tab(text: 'Saved Routes'),
-                  ],
-                ),
-              ],
+                  const SizedBox(width: 12),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Route Planning',
+                        style: textTheme.titleMedium?.copyWith(
+                          color: colorScheme.onSurface,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 18,
+                        ),
+                      ),
+                      Text(
+                        'Find the best route',
+                        style: textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurface.withOpacity(0.7),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              titlePadding: const EdgeInsets.only(left: 24, bottom: 16),
             ),
           ),
 
-          // Tab content
-          Expanded(
+          // Search Section
+          SliverToBoxAdapter(
+            child: Container(
+              margin: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    colorScheme.surface,
+                    colorScheme.surface.withOpacity(0.8),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: colorScheme.outline.withOpacity(0.2),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // From Field
+                  _buildSearchField(
+                    controller: _fromController,
+                    label: 'From',
+                    hint: 'Enter pickup location',
+                    icon: Symbols.location_on,
+                    color: colorScheme.primary,
+                  ),
+                  const SizedBox(height: 20),
+                  
+                  // To Field
+                  _buildSearchField(
+                    controller: _toController,
+                    label: 'To',
+                    hint: 'Enter destination',
+                    icon: Symbols.location_on,
+                    color: colorScheme.secondary,
+                  ),
+                  const SizedBox(height: 20),
+                  
+                  // Date and Time Row
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildDateTimeField(
+                          label: 'Date',
+                          value: _selectedDate?.toString().split(' ')[0] ?? 'Today',
+                          icon: Symbols.calendar_today,
+                          onTap: () => _selectDate(context),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: _buildDateTimeField(
+                          label: 'Time',
+                          value: _selectedTime?.format(context) ?? 'Now',
+                          icon: Symbols.schedule,
+                          onTap: () => _selectTime(context),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  
+                  // Search Button
+                  Container(
+                    height: 56,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          colorScheme.primary,
+                          colorScheme.secondary,
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: colorScheme.primary.withOpacity(0.3),
+                          blurRadius: 12,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: ElevatedButton(
+                      onPressed: _handleSearch,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Symbols.search,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Find Routes',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Tabs
+          SliverPersistentHeader(
+            pinned: true,
+            delegate: _SliverAppBarDelegate(
+              TabBar(
+                controller: _tabController,
+                labelColor: colorScheme.primary,
+                unselectedLabelColor: colorScheme.onSurface.withOpacity(0.6),
+                indicatorColor: colorScheme.primary,
+                indicatorWeight: 3,
+                labelStyle: textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+                tabs: const [
+                  Tab(text: 'Search Results'),
+                  Tab(text: 'Popular Routes'),
+                  Tab(text: 'Saved Routes'),
+                ],
+              ),
+            ),
+          ),
+
+          // Tab Content
+          SliverFillRemaining(
             child: TabBarView(
               controller: _tabController,
               children: [
@@ -395,6 +378,142 @@ class _RoutesScreenState extends State<RoutesScreen>
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildSearchField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required IconData icon,
+    required Color color,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: controller,
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.6),
+            ),
+            prefixIcon: Container(
+              margin: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                icon,
+                color: color,
+                size: 20,
+              ),
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: color,
+                width: 2,
+              ),
+            ),
+            filled: true,
+            fillColor: Theme.of(context).colorScheme.surface,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 16,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDateTimeField({
+    required String label,
+    required String value,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+        const SizedBox(height: 8),
+        InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.outline.withOpacity(0.3),
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Icon(
+                    icon,
+                    color: Theme.of(context).colorScheme.primary,
+                    size: 16,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    value,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+                Icon(
+                  Icons.arrow_drop_down,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -622,5 +741,28 @@ class _RoutesScreenState extends State<RoutesScreen>
   void _navigateToRouteDetails(BusRoute route) {
     // Navigate to route details screen using context.go
     context.go(AppRoutes.routeDetails, extra: {'route': route});
+  }
+}
+
+class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+  final TabBar tabBar;
+
+  _SliverAppBarDelegate(this.tabBar);
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return tabBar;
+  }
+
+  @override
+  double get maxExtent => tabBar.preferredSize.height;
+
+  @override
+  double get minExtent => tabBar.preferredSize.height;
+
+  @override
+  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
+    return oldDelegate.tabBar != tabBar;
   }
 }

@@ -50,85 +50,158 @@ class _AlertScreenState extends State<AlertScreen>
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Alerts & Updates'),
-        backgroundColor: colorScheme.surface,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Refreshing alerts...')),
-              );
-            },
-          ),
-        ],
-      ),
-      body: SlideTransition(
-        position: _slideAnimation,
-        child: FadeTransition(
-          opacity: _fadeAnimation,
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(24.0, 24.0, 24.0, 24.0),
-            children: [
-              const SizedBox(height: 12),
-              _buildAlertCard(
-                title: 'Level Up! 🎉',
-                message:
-                    'Congratulations! You have been upgraded to Silver Level from Bronze. Enjoy enhanced benefits and rewards!',
-                type: AlertType.info,
-                timestamp: DateTime.now().subtract(const Duration(minutes: 45)),
-                context: context,
+      backgroundColor: colorScheme.surface,
+      body: CustomScrollView(
+        slivers: [
+          // Enhanced App Bar
+          SliverAppBar(
+            expandedHeight: 120,
+            floating: true,
+            snap: true,
+            backgroundColor: colorScheme.surface,
+            surfaceTintColor: colorScheme.surfaceTint,
+            elevation: 0,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      colorScheme.primary.withOpacity(0.1),
+                      colorScheme.secondary.withOpacity(0.05),
+                    ],
+                  ),
+                ),
               ),
-              const SizedBox(height: 12),
-              _buildAlertCard(
-                title: 'Lost Item Found',
-                message:
-                    'A blue backpack was found on bus route 156. If this belongs to you, please contact the Central Station lost and found office.',
-                type: AlertType.info,
-                timestamp: DateTime.now().subtract(const Duration(hours: 1)),
-                context: context,
+              title: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          colorScheme.primary,
+                          colorScheme.secondary,
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: colorScheme.primary.withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      Icons.notifications,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Alerts & Updates',
+                        style: textTheme.titleMedium?.copyWith(
+                          color: colorScheme.onSurface,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 18,
+                        ),
+                      ),
+                      Text(
+                        'Stay informed',
+                        style: textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurface.withOpacity(0.7),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              const SizedBox(height: 12),
-              _buildAlertCard(
-                title: 'Found Item Claimed',
-                message:
-                    'A wallet found on bus 203 has been successfully returned to its owner. Thank you for using our lost and found service!',
-                type: AlertType.info,
-                timestamp: DateTime.now().subtract(const Duration(hours: 3)),
-                context: context,
-              ),
-              _buildAlertCard(
-                title: 'Route 138 Delay',
-                message:
-                    'Bus route 138 is experiencing delays due to heavy traffic at Colombo Road.',
-                type: AlertType.delay,
-                timestamp: DateTime.now().subtract(const Duration(minutes: 15)),
-                context: context,
-              ),
-              const SizedBox(height: 12),
-              _buildAlertCard(
-                title: 'Service Update',
-                message:
-                    'New express bus service starting from Central Station to Airport from tomorrow.',
-                type: AlertType.info,
-                timestamp: DateTime.now().subtract(const Duration(hours: 2)),
-                context: context,
-              ),
-              const SizedBox(height: 12),
-              _buildAlertCard(
-                title: 'Weather Warning',
-                message:
-                    'Heavy rain expected. Some routes may experience delays.',
-                type: AlertType.warning,
-                timestamp: DateTime.now().subtract(const Duration(hours: 4)),
-                context: context,
+              titlePadding: const EdgeInsets.only(left: 24, bottom: 16),
+            ),
+            actions: [
+              Container(
+                margin: const EdgeInsets.only(right: 8),
+                decoration: BoxDecoration(
+                  color: colorScheme.surface.withOpacity(0.9),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: colorScheme.outline.withOpacity(0.2),
+                  ),
+                ),
+                child: IconButton(
+                  icon: Icon(
+                    Icons.refresh,
+                    color: colorScheme.primary,
+                  ),
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text('Refreshing alerts...'),
+                        backgroundColor: colorScheme.primary,
+                      ),
+                    );
+                  },
+                ),
               ),
             ],
           ),
-        ),
+
+          // Alert Content
+          SliverPadding(
+            padding: const EdgeInsets.all(24.0),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
+                SlideTransition(
+                  position: _slideAnimation,
+                  child: FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: Column(
+                      children: [
+                        _buildAlertCard(
+                          title: 'Level Up! 🎉',
+                          message:
+                              'Congratulations! You have been upgraded to Silver Level from Bronze. Enjoy enhanced benefits and rewards!',
+                          type: AlertType.info,
+                          timestamp: DateTime.now().subtract(const Duration(minutes: 45)),
+                          context: context,
+                        ),
+                        const SizedBox(height: 16),
+                        _buildAlertCard(
+                          title: 'Lost Item Found',
+                          message:
+                              'A blue backpack was found on bus route 156. If this belongs to you, please contact the Central Station lost and found office.',
+                          type: AlertType.info,
+                          timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+                          context: context,
+                        ),
+                        const SizedBox(height: 16),
+                        _buildAlertCard(
+                          title: 'Found Item Claimed',
+                          message:
+                              'A wallet found on bus 203 has been successfully returned to its owner. Thank you for using our lost and found service!',
+                          type: AlertType.info,
+                          timestamp: DateTime.now().subtract(const Duration(hours: 3)),
+                          context: context,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ]),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -143,69 +216,142 @@ class _AlertScreenState extends State<AlertScreen>
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return Card(
-      elevation: 2,
-      margin: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: ListTile(
-        leading: _getAlertIcon(type, context),
-        title: Text(
-          title,
-          style: textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: colorScheme.onSurface,
-          ),
+    Color cardColor;
+    Color iconColor;
+    Color borderColor;
+
+    switch (type) {
+      case AlertType.info:
+        cardColor = colorScheme.primary.withOpacity(0.05);
+        iconColor = colorScheme.primary;
+        borderColor = colorScheme.primary.withOpacity(0.2);
+        break;
+      case AlertType.warning:
+        cardColor = Colors.orange.withOpacity(0.05);
+        iconColor = Colors.orange;
+        borderColor = Colors.orange.withOpacity(0.2);
+        break;
+      case AlertType.delay:
+        cardColor = Colors.red.withOpacity(0.05);
+        iconColor = Colors.red;
+        borderColor = Colors.red.withOpacity(0.2);
+        break;
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            cardColor,
+            cardColor.withOpacity(0.5),
+          ],
         ),
-        subtitle: Column(
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: borderColor,
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 4),
-            Text(
-              message,
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant,
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    iconColor,
+                    iconColor.withOpacity(0.8),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: iconColor.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Icon(
+                _getAlertIconData(type),
+                color: Colors.white,
+                size: 24,
               ),
             ),
-            const SizedBox(height: 4),
-            Text(
-              DateFormat('MMM dd, yyyy hh:mm a').format(timestamp),
-              style: textTheme.bodySmall?.copyWith(
-                color: colorScheme.onSurfaceVariant.withOpacity(0.7),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: colorScheme.onSurface,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    message,
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurface.withOpacity(0.7),
+                      fontSize: 14,
+                      height: 1.4,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: colorScheme.onSurface.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: colorScheme.onSurface.withOpacity(0.2),
+                      ),
+                    ),
+                    child: Text(
+                      DateFormat('MMM dd, yyyy hh:mm a').format(timestamp),
+                      style: textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurface.withOpacity(0.6),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
         ),
-        isThreeLine: true,
-        contentPadding: const EdgeInsets.all(16),
       ),
     );
   }
 
-  Widget _getAlertIcon(AlertType type, BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    IconData icon;
-    Color backgroundColor;
-
+  IconData _getAlertIconData(AlertType type) {
     switch (type) {
-      case AlertType.delay:
-        icon = Icons.timer;
-        backgroundColor = colorScheme.errorContainer;
-        break;
-      case AlertType.warning:
-        icon = Icons.warning;
-        backgroundColor = colorScheme.error;
-        break;
       case AlertType.info:
-        icon = Icons.info;
-        backgroundColor = colorScheme.primary;
-        break;
+        return Icons.info;
+      case AlertType.warning:
+        return Icons.warning;
+      case AlertType.delay:
+        return Icons.schedule;
     }
-
-    return CircleAvatar(
-      backgroundColor: backgroundColor,
-      child: Icon(icon, color: colorScheme.onPrimary, size: 20),
-    );
   }
 }
 
